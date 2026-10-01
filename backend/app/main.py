@@ -23,39 +23,4 @@ from app.api.overview import (
 app = FastAPI()
 
 
-FRONTEND_URL = os.getenv(
-    "FRONTEND_URL",
-    "http://localhost:5173",
-)
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        FRONTEND_URL,
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-app.include_router(
-    ingestion_router
-)
-
-app.include_router(
-    dashboard_router
-)
-
-app.include_router(
-    mobile_ingestion_router
-)
-
-app.include_router(
-    mobile_dashboard_router
-)
-
-app.include_router(
-    overview_router
-)
+FRONTEND_URL = o

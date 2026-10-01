@@ -1383,3 +1383,36 @@ input {
         grid-template-columns: 1fr;
     }
 }
+
+.web-table-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.web-export-button {
+    height: 34px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.web-export-button:hover:not(:disabled) {
+    background: #f9fafb;
+}
+
+.web-export-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

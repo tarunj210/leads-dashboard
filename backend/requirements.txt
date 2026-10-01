@@ -4,7 +4,7 @@ uvicorn[standard]==0.37.0
 pandas==2.3.2
 
 SQLAlchemy==2.0.43
-psycopg[binary]==3.2.10
+psycopg2-binary==2.9.10
 
 google-auth==2.40.3
 google-auth-oauthlib==1.2.2

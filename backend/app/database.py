@@ -1,18 +1,29 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+import os
 
-
-DATABASE_URL = (
-    "postgresql://"
-    "leads_user:"
-    "leads_password@"
-    "localhost:5433/"
-    "leads_db"
+from sqlalchemy import (
+    create_engine,
 )
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    sessionmaker,
+)
+
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL"
+)
+
+
+if not DATABASE_URL:
+
+    raise RuntimeError(
+        "DATABASE_URL environment variable is not set"
+    )
 
 
 engine = create_engine(
     DATABASE_URL,
+    pool_pre_ping=True,
 )
 
 
@@ -21,5 +32,7 @@ SessionLocal = sessionmaker(
 )
 
 
-class Base(DeclarativeBase):
+class Base(
+    DeclarativeBase
+):
     pass

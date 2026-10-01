@@ -1,0 +1,705 @@
+/* =========================================
+   Mobile Dashboard Page
+========================================= */
+
+.mobile-dashboard-page {
+    width: 100%;
+    max-width: 1500px;
+
+    min-height: 100vh;
+
+    margin: 0 auto;
+    padding: 32px 48px 60px;
+
+    background: transparent;
+}
+
+
+/* =========================================
+   Header
+========================================= */
+
+.mobile-dashboard-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+}
+
+.mobile-dashboard-header h1 {
+    margin: 0;
+
+    color: #101828;
+
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.mobile-dashboard-header p {
+    margin: 5px 0 0;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   Filter Container
+========================================= */
+
+.mobile-dashboard-filters {
+    margin-bottom: 22px;
+}
+
+
+/* =========================================
+   Dashboard State
+========================================= */
+
+.mobile-dashboard-message {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 14px;
+}
+
+.mobile-dashboard-updating {
+    margin:
+        -10px
+        0
+        14px;
+
+    color: #667085;
+
+    font-size: 12px;
+}
+
+.mobile-dashboard-inline-error {
+    margin: 0 0 18px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-size: 13px;
+}
+
+.mobile-dashboard-error {
+    padding: 20px;
+
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+
+    background: #ffffff;
+}
+
+.mobile-dashboard-error h2 {
+    margin: 0 0 8px;
+
+    color: #991b1b;
+
+    font-size: 18px;
+}
+
+.mobile-dashboard-error p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   KPI Grid
+========================================= */
+
+.mobile-metric-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin: 20px 0 24px;
+}
+
+
+/* =========================================
+   KPI Cards
+   Scoped so Web dashboard styles do not
+   get unintentionally overwritten
+========================================= */
+
+.mobile-dashboard-page .metric-card {
+    min-width: 0;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px
+        rgba(16, 24, 40, 0.04);
+}
+
+.mobile-dashboard-page .metric-card-title {
+    margin: 0 0 10px;
+
+    color: #667085;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.mobile-dashboard-page .metric-card-value {
+    margin: 0;
+
+    color: #101828;
+
+    font-size: 27px;
+    line-height: 1.15;
+
+    font-weight: 700;
+
+    letter-spacing: -0.03em;
+
+    overflow-wrap: anywhere;
+}
+
+.mobile-dashboard-page .metric-card-subtitle {
+    margin: 8px 0 0;
+
+    color: #98a2b3;
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+
+/* Tracking number can be long. Keep the
+   value from becoming visually oversized. */
+
+.mobile-metric-grid
+.metric-card:nth-child(5)
+.metric-card-value {
+    font-size: 21px;
+
+    letter-spacing: -0.015em;
+}
+
+
+/* =========================================
+   Table Card
+========================================= */
+
+.mobile-table-card {
+    margin-top: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px
+        rgba(16, 24, 40, 0.04);
+
+    overflow: hidden;
+}
+
+
+/* =========================================
+   Table Header
+========================================= */
+
+.mobile-table-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 20px 22px;
+
+    border-bottom: 1px solid #eef0f3;
+}
+
+.mobile-table-header h2 {
+    margin: 0;
+
+    color: #101828;
+
+    font-size: 15px;
+    font-weight: 650;
+}
+
+.mobile-table-header p {
+    max-width: 720px;
+
+    margin: 4px 0 0;
+
+    color: #98a2b3;
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.mobile-table-count {
+    flex-shrink: 0;
+
+    padding: 5px 10px;
+
+    border: 1px solid #eaecf0;
+    border-radius: 999px;
+
+    background: #f9fafb;
+
+    color: #475467;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   Table Loading
+========================================= */
+
+.mobile-table-loading {
+    padding: 10px 20px;
+
+    border-bottom: 1px solid #dbeafe;
+
+    background: #eff6ff;
+
+    color: #1d4ed8;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   Table
+========================================= */
+
+.mobile-table-scroll {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.mobile-table {
+    width: 100%;
+
+    min-width: 1120px;
+
+    border-collapse: collapse;
+}
+
+.mobile-table th {
+    padding: 12px 14px;
+
+    text-align: left;
+
+    background: #f9fafb;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    color: #667085;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.mobile-table td {
+    padding: 13px 14px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    color: #344054;
+
+    font-size: 12px;
+
+    vertical-align: middle;
+
+    white-space: nowrap;
+}
+
+.mobile-table tbody tr {
+    transition: background 0.12s ease;
+}
+
+.mobile-table tbody tr:hover {
+    background: #fafbfc;
+}
+
+.mobile-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.mobile-table-empty {
+    padding: 44px 20px !important;
+
+    text-align: center !important;
+
+    color: #667085 !important;
+
+    font-size: 13px !important;
+}
+
+
+/* =========================================
+   Helpful table column emphasis
+========================================= */
+
+.mobile-table td:nth-child(2),
+.mobile-table td:nth-child(3) {
+    color: #101828;
+
+    font-weight: 500;
+}
+
+.mobile-table td:nth-child(5),
+.mobile-table td:nth-child(7) {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================
+   Pagination
+========================================= */
+
+.mobile-pagination {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 14px;
+
+    padding: 14px 20px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #ffffff;
+}
+
+.mobile-pagination span {
+    color: #667085;
+
+    font-size: 12px;
+}
+
+.mobile-pagination button {
+    min-width: 78px;
+
+    padding: 7px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.mobile-pagination button:hover:not(:disabled) {
+    background: #f9fafb;
+
+    border-color: #98a2b3;
+}
+
+.mobile-pagination button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   Responsive
+========================================= */
+
+@media (max-width: 1200px) {
+
+    .mobile-metric-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 900px) {
+
+    .mobile-metric-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .mobile-table-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 760px) {
+
+    .mobile-dashboard-page {
+        padding:
+            24px
+            18px
+            40px;
+    }
+
+    .mobile-dashboard-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .mobile-dashboard-header h1 {
+        font-size: 24px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .mobile-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mobile-pagination {
+        justify-content: space-between;
+
+        gap: 8px;
+    }
+
+    .mobile-pagination span {
+        text-align: center;
+    }
+
+    .mobile-pagination button {
+        min-width: 72px;
+    }
+}
+
+/* =========================================
+   Export Button
+========================================= */
+
+.mobile-export-button {
+    height: 36px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.mobile-export-button:hover {
+    background: #f9fafb;
+
+    border-color: #98a2b3;
+}
+
+
+/* =========================================
+   Cleaner Call Table
+========================================= */
+
+.mobile-table {
+    min-width: 760px;
+}
+
+.mobile-table th:nth-child(1) {
+    width: 18%;
+}
+
+.mobile-table th:nth-child(2) {
+    width: 26%;
+}
+
+.mobile-table th:nth-child(3) {
+    width: 38%;
+}
+
+.mobile-table th:nth-child(4) {
+    width: 12%;
+}
+
+.mobile-table th:nth-child(5) {
+    width: 6%;
+}
+
+
+.mobile-connected-cell {
+    color: #101828 !important;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+
+.mobile-caller-cell {
+    color: #344054;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+.mobile-cost-cell {
+    color: #101828 !important;
+
+    font-weight: 500;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/* =========================================
+   Duration Visual
+========================================= */
+
+.mobile-duration-cell {
+    display: grid;
+
+    grid-template-columns:
+        minmax(120px, 1fr)
+        66px;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.mobile-duration-track {
+    width: 100%;
+
+    height: 5px;
+
+    overflow: hidden;
+
+    background: #eaecf0;
+
+    border-radius: 999px;
+}
+
+
+.mobile-duration-bar {
+    height: 100%;
+
+    background: #315ecd;
+
+    border-radius: 999px;
+}
+
+
+.mobile-duration-value {
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/* =========================================
+   Row Details
+========================================= */
+
+.mobile-details-column {
+    width: 42px;
+}
+
+
+.mobile-row-chevron {
+    color: #98a2b3;
+
+    font-size: 20px;
+
+    text-align: center;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   Pagination
+========================================= */
+
+.mobile-pagination {
+    justify-content: space-between;
+}
+
+
+.mobile-pagination-summary {
+    color: #667085;
+
+    font-size: 11px;
+}
+
+
+.mobile-pagination-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}

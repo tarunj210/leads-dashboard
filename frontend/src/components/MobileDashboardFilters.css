@@ -1,0 +1,588 @@
+/* =========================================
+   Mobile Dashboard Filters
+========================================= */
+
+.mobile-dashboard-filters {
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(340px, 1.7fr)
+        minmax(180px, 0.7fr)
+        auto;
+
+    gap: 14px;
+
+    align-items: end;
+
+    margin-bottom: 22px;
+
+    padding: 18px;
+
+    background: white;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 2px 8px
+        rgba(0, 0, 0, 0.05);
+
+    overflow: visible;
+}
+
+
+/* =========================================
+   Generic Filter Group
+========================================= */
+
+.mobile-filter-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+
+    overflow: visible;
+}
+
+.mobile-filter-group > label {
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #6b7280;
+}
+
+
+/* =========================================
+   Duration Input
+========================================= */
+
+.mobile-filter-input {
+    width: 100%;
+
+    height: 42px;
+
+    padding: 0 11px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: white;
+
+    color: #1f2937;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.mobile-filter-input:hover {
+    border-color: #9ca3af;
+}
+
+.mobile-filter-input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+}
+
+
+/* =========================================
+   Date Filter
+========================================= */
+
+.mobile-date-filter {
+    position: relative;
+
+    min-width: 340px;
+}
+
+.mobile-date-picker-wrapper {
+    position: relative;
+
+    width: 100%;
+
+    overflow: visible;
+}
+
+
+/* =========================================
+   Date Range Button
+========================================= */
+
+.mobile-date-range-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    width: 100%;
+
+    height: 42px;
+
+    padding: 0 12px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: white;
+
+    color: #1f2937;
+
+    font-size: 13px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    outline: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.mobile-date-range-button:hover {
+    border-color: #9ca3af;
+}
+
+.mobile-date-range-button:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+}
+
+.mobile-date-range-value {
+    min-width: 0;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+.mobile-date-range-arrow {
+    flex-shrink: 0;
+
+    color: #6b7280;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   Calendar Popup
+========================================= */
+
+.mobile-calendar-popup {
+    position: absolute;
+
+    top: calc(100% + 8px);
+    left: 0;
+
+    z-index: 9999;
+
+    width: 360px;
+
+    overflow: hidden;
+
+    background: white;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 18px 45px
+        rgba(15, 23, 42, 0.16);
+}
+
+
+/* =========================================
+   React Day Picker
+========================================= */
+
+.mobile-calendar-popup
+.rdp-root {
+    margin: 0;
+
+    padding: 16px 16px 8px;
+
+    --rdp-accent-color:
+        #2563eb;
+
+    --rdp-accent-background-color:
+        #eff6ff;
+
+    --rdp-day-height:
+        38px;
+
+    --rdp-day-width:
+        38px;
+}
+
+.mobile-calendar-popup
+.rdp-month {
+    width: 100%;
+}
+
+.mobile-calendar-popup
+.rdp-month_caption {
+    font-weight: 600;
+
+    color: #111827;
+}
+
+.mobile-calendar-popup
+.rdp-weekday {
+    color: #6b7280;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+.mobile-calendar-popup
+.rdp-day_button {
+    border-radius: 8px;
+
+    font-size: 13px;
+}
+
+.mobile-calendar-popup
+.rdp-disabled {
+    opacity: 0.25;
+
+    cursor: not-allowed;
+}
+
+.mobile-calendar-popup
+.rdp-selected
+.rdp-day_button {
+    font-weight: 600;
+}
+
+
+/* =========================================
+   Calendar Help
+========================================= */
+
+.mobile-calendar-help {
+    padding:
+        9px
+        16px
+        12px;
+
+    border-bottom:
+        1px solid #eef2f7;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+/* =========================================
+   Time Controls
+========================================= */
+
+.mobile-time-range-controls {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    gap: 12px;
+
+    padding: 16px;
+}
+
+.mobile-time-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    min-width: 0;
+}
+
+.mobile-time-field > label {
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.04em;
+
+    text-transform: uppercase;
+}
+
+.mobile-time-field
+input[type="time"] {
+    width: 100%;
+
+    height: 39px;
+
+    padding: 0 9px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #f9fafb;
+
+    color: #1f2937;
+
+    font-size: 13px;
+
+    outline: none;
+}
+
+.mobile-time-field
+input[type="time"]:hover {
+    border-color: #9ca3af;
+}
+
+.mobile-time-field
+input[type="time"]:focus {
+    border-color: #2563eb;
+
+    background: white;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+}
+
+
+/* =========================================
+   Date Time Error
+========================================= */
+
+.mobile-date-time-error {
+    margin:
+        0
+        16px
+        12px;
+
+    padding: 9px 10px;
+
+    border:
+        1px solid #fecaca;
+
+    border-radius: 7px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================
+   Calendar Actions
+========================================= */
+
+.mobile-calendar-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    padding:
+        12px
+        16px
+        16px;
+
+    border-top:
+        1px solid #eef2f7;
+}
+
+.mobile-calendar-actions button {
+    height: 36px;
+
+    padding: 0 14px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.mobile-calendar-cancel-button {
+    border:
+        1px solid #d1d5db;
+
+    background: white;
+
+    color: #374151;
+}
+
+.mobile-calendar-cancel-button:hover {
+    background: #f9fafb;
+}
+
+.mobile-calendar-apply-button {
+    border:
+        1px solid #2563eb;
+
+    background: #2563eb;
+
+    color: white;
+}
+
+.mobile-calendar-apply-button:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================
+   Clear Filters
+========================================= */
+
+.mobile-clear-filters-button {
+    height: 42px;
+
+    padding: 0 16px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: white;
+
+    color: #374151;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.mobile-clear-filters-button:hover {
+    background: #f3f4f6;
+}
+
+
+/* =========================================
+   Responsive
+========================================= */
+
+@media (
+    max-width: 900px
+) {
+
+    .mobile-dashboard-filters {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .mobile-date-filter {
+        grid-column:
+            1 / -1;
+
+        min-width: 0;
+    }
+
+}
+
+
+@media (
+    max-width: 600px
+) {
+
+    .mobile-dashboard-filters {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .mobile-date-filter {
+        grid-column: auto;
+
+        min-width: 0;
+    }
+
+
+    .mobile-calendar-popup {
+        width:
+            min(
+                360px,
+                calc(
+                    100vw - 48px
+                )
+            );
+
+        max-width:
+            calc(
+                100vw - 48px
+            );
+    }
+
+
+    .mobile-time-range-controls {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .mobile-calendar-actions {
+        display: grid;
+
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+
+    .mobile-calendar-actions button {
+        width: 100%;
+    }
+
+
+    .mobile-clear-filters-button {
+        width: 100%;
+    }
+
+}

@@ -1,0 +1,523 @@
+/* =========================================
+   Overview Page
+========================================= */
+
+.overview-page {
+    width: 100%;
+    max-width: 1500px;
+
+    min-height: 100vh;
+
+    margin: 0 auto;
+
+    padding:
+        34px
+        48px
+        60px;
+
+    background: transparent;
+}
+
+
+/* =========================================
+   State
+========================================= */
+
+.overview-message {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   Primary Grid
+========================================= */
+
+.overview-primary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 16px;
+
+    margin-bottom: 24px;
+}
+
+
+/* =========================================
+   KPI Cards
+========================================= */
+
+.overview-kpi-card {
+    min-width: 0;
+
+    padding:
+        24px
+        24px
+        20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px
+        rgba(16, 24, 40, 0.04);
+}
+
+
+.overview-kpi-title {
+    color: #475467;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.overview-kpi-value {
+    margin-top: 14px;
+
+    color: #101828;
+
+    font-size: 36px;
+    line-height: 1;
+
+    font-weight: 700;
+
+    letter-spacing: -0.04em;
+}
+
+
+.overview-kpi-subtitle {
+    margin-top: 18px;
+
+    color: #667085;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   Total Lead Split
+========================================= */
+
+.overview-total-bar {
+    display: flex;
+
+    width: 100%;
+    height: 7px;
+
+    margin-top: 18px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background: #eef2f6;
+}
+
+
+.overview-total-web {
+    background: #315ecd;
+}
+
+
+.overview-total-mobile {
+    background: #8daaf4;
+
+    border-left: 1px solid #ffffff;
+}
+
+
+.overview-total-labels {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 8px;
+
+    color: #475467;
+
+    font-size: 12px;
+}
+
+
+.overview-total-labels strong {
+    color: #101828;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   Conversion
+========================================= */
+
+.overview-conversion-track {
+    width: 100%;
+    height: 7px;
+
+    margin-top: 18px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background: #eef2f6;
+}
+
+
+.overview-conversion-fill {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: #198754;
+}
+
+
+/* =========================================
+   Performance Grid
+========================================= */
+
+.overview-performance-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    gap: 16px;
+
+    margin-bottom: 24px;
+}
+
+
+.overview-performance-card {
+    min-width: 0;
+
+    padding: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px
+        rgba(16, 24, 40, 0.04);
+}
+
+
+.overview-performance-header {
+    margin-bottom: 18px;
+}
+
+
+.overview-performance-header h2 {
+    margin: 0;
+
+    color: #101828;
+
+    font-size: 15px;
+    font-weight: 650;
+}
+
+
+.overview-performance-header p {
+    margin: 4px 0 0;
+
+    color: #667085;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   Performance Mini Cards
+========================================= */
+
+.overview-web-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.overview-mobile-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.overview-mini-card {
+    padding:
+        14px
+        12px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+}
+
+
+.overview-mini-card span {
+    display: block;
+
+    color: #475467;
+
+    font-size: 11px;
+}
+
+
+.overview-mini-card strong {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #101828;
+
+    font-size: 21px;
+    font-weight: 650;
+}
+
+
+/* =========================================
+   Leads by Channel
+========================================= */
+
+.overview-channel-card {
+    padding: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px
+        rgba(16, 24, 40, 0.04);
+}
+
+
+.overview-channel-header {
+    margin-bottom: 20px;
+}
+
+
+.overview-channel-header h2 {
+    margin: 0;
+
+    color: #101828;
+
+    font-size: 15px;
+    font-weight: 650;
+}
+
+
+.overview-channel-header p {
+    margin: 3px 0 0;
+
+    color: #667085;
+
+    font-size: 11px;
+}
+
+
+.overview-channel-row {
+    display: grid;
+
+    grid-template-columns:
+        80px
+        minmax(0, 1fr)
+        100px;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-top: 16px;
+}
+
+
+.overview-channel-name {
+    color: #101828;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.overview-channel-track {
+    width: 100%;
+    height: 8px;
+
+    overflow: hidden;
+
+    background: #eef2f6;
+
+    border-radius: 999px;
+}
+
+
+.overview-channel-fill {
+    height: 100%;
+
+    border-radius: inherit;
+}
+
+
+.overview-channel-web {
+    background: #315ecd;
+}
+
+
+.overview-channel-mobile {
+    background: #8daaf4;
+}
+
+
+.overview-channel-value {
+    text-align: right;
+
+    color: #667085;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+.overview-channel-value strong {
+    color: #101828;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   Error
+========================================= */
+
+.overview-error {
+    padding: 20px;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+}
+
+
+.overview-error h2 {
+    margin: 0 0 8px;
+
+    color: #991b1b;
+
+    font-size: 18px;
+}
+
+
+.overview-error p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   Responsive
+========================================= */
+
+@media (max-width: 1050px) {
+
+    .overview-performance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 900px) {
+
+    .overview-primary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 760px) {
+
+    .overview-page {
+        padding:
+            24px
+            18px
+            40px;
+    }
+
+
+    .overview-web-grid,
+    .overview-mobile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .overview-channel-row {
+        grid-template-columns:
+            60px
+            minmax(0, 1fr)
+            80px;
+    }
+}
+
+.overview-updating {
+    margin: 0 0 14px;
+
+    color: #667085;
+
+    font-size: 12px;
+}
+
+.overview-inline-error {
+    margin: 0 0 18px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-size: 12px;
+}

@@ -1,0 +1,302 @@
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+.app-header-inner {
+    display: flex;
+
+    align-items: stretch;
+
+    width: 100%;
+
+    min-height: 64px;
+
+    padding: 0 56px;
+}
+
+
+/* =========================================
+   Brand
+========================================= */
+
+.app-header-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-right: 36px;
+}
+
+
+.app-header-logo {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: center;
+
+    gap: 2px;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 9px 8px;
+
+    border-radius: 8px;
+
+    background: #111827;
+}
+
+
+.app-header-logo span {
+    display: block;
+
+    width: 3px;
+
+    border-radius: 2px;
+
+    background: #ffffff;
+}
+
+
+.app-header-logo span:nth-child(1) {
+    height: 7px;
+}
+
+
+.app-header-logo span:nth-child(2) {
+    height: 13px;
+}
+
+
+.app-header-logo span:nth-child(3) {
+    height: 10px;
+}
+
+
+.app-header-brand-text {
+    line-height: 1.2;
+}
+
+
+.app-header-title {
+    color: #111827;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.app-header-subtitle {
+    margin-top: 2px;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+}
+
+
+/* =========================================
+   Navigation
+========================================= */
+
+.app-header-nav {
+    display: flex;
+
+    align-items: stretch;
+
+    gap: 6px;
+}
+
+
+.app-nav-item {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 0 12px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #667085;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease;
+}
+
+
+.app-nav-item:hover {
+    color: #111827;
+}
+
+
+.app-nav-item.active {
+    color: #111827;
+
+    font-weight: 600;
+}
+
+
+.app-nav-item.active::after {
+    content: "";
+
+    position: absolute;
+
+    left: 10px;
+    right: 10px;
+    bottom: 0;
+
+    height: 2px;
+
+    border-radius: 2px 2px 0 0;
+
+    background: #315ecd;
+}
+
+
+/* =========================================
+   Count Badge
+========================================= */
+
+.app-nav-count {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 20px;
+    height: 20px;
+
+    padding: 0 6px;
+
+    border-radius: 999px;
+
+    background: #f2f4f7;
+
+    color: #667085;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   Responsive
+========================================= */
+
+@media (max-width: 800px) {
+
+    .app-header-inner {
+        padding: 0 20px;
+
+        overflow-x: auto;
+    }
+
+
+    .app-header-brand {
+        margin-right: 18px;
+
+        flex-shrink: 0;
+    }
+
+
+    .app-header-nav {
+        flex-shrink: 0;
+    }
+
+}
+
+
+@media (max-width: 560px) {
+
+    .app-header-subtitle {
+        display: none;
+    }
+
+
+    .app-header-brand {
+        margin-right: 8px;
+    }
+
+
+    .app-nav-item {
+        padding: 0 8px;
+
+        font-size: 12px;
+    }
+
+}
+
+.app-header-actions {
+    display: flex;
+
+    align-items: center;
+
+    margin-left: auto;
+}
+
+
+.app-header-refresh {
+    height: 36px;
+
+    padding:
+        0
+        14px;
+
+    border:
+        1px solid #d0d5dd;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+
+.app-header-refresh:hover:not(:disabled) {
+    background: #f9fafb;
+
+    border-color: #98a2b3;
+}
+
+
+.app-header-refresh:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}

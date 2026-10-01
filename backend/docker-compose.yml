@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: lead-dashboard-postgres
+    environment:
+      POSTGRES_DB: leads_db
+      POSTGRES_USER: leads_user
+      POSTGRES_PASSWORD: leads_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

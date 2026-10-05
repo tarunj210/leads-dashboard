@@ -18,7 +18,7 @@ SPREADSHEET_ID = "197kt7D6tNS8QIKYMX8Pv0iZgiiwbKdJSmh-mmaXzXuc"
 
 
 # Change "Data" if your tab name is different
-RANGE_NAME = "Data!A1:I"
+RANGE_NAME = "Data!A:I"
 
 
 # ---------------------------------------------------------
@@ -305,24 +305,11 @@ def normalize_dates(
 
     df = df.copy()
 
-    print("RAW CONNECT TIME VALUES:")
-    print(
-        df["connect_time"]
-        .head(10)
-        .tolist()
-    )
-
     df["connect_time"] = pd.to_datetime(
         df["connect_time"],
-        format="%d/%m/%Y %H:%M",
+        format="mixed",
+        dayfirst=True,
         errors="coerce",
-    )
-
-    print("PARSED CONNECT TIME VALUES:")
-    print(
-        df["connect_time"]
-        .head(10)
-        .tolist()
     )
 
     return df

@@ -15,7 +15,7 @@ from app.integrations.google_sheets import (
 
 
 SPREADSHEET_ID = "19L7ZMFqButG0j7UW5HpYeVuwFCLX0B1_5FhtLyihhWI"
-RANGE_NAME = "Data!A1:M"
+RANGE_NAME = "Data!A:M"
 
 
 REQUIRED_COLUMNS = {

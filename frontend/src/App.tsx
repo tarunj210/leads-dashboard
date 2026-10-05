@@ -15,6 +15,9 @@ import DashboardPage
 import MobileDashboard
     from "./components/MobileDashboard";
 
+import MarketingDashboard
+    from "./components/MarketingDashboard";
+
 import "./App.css";
 
 const API_BASE_URL =
@@ -45,12 +48,12 @@ export default function App() {
     async function handleRefresh() {
 
         try {
-    
+
             setRefreshing(true);
-    
-    
+
+
             if (activeTab === "web") {
-    
+
                 const response =
                     await fetch(
                         `${API_BASE_URL}/api/ingestion/refresh`,
@@ -58,19 +61,19 @@ export default function App() {
                             method: "POST",
                         }
                     );
-    
-    
+
+
                 if (!response.ok) {
                     throw new Error(
                         "Failed to refresh web leads"
                     );
                 }
-    
+
             }
-    
-    
+
+
             if (activeTab === "mobile") {
-    
+
                 const response =
                     await fetch(
                         `${API_BASE_URL}/api/mobile-ingestion/refresh`,
@@ -78,41 +81,58 @@ export default function App() {
                             method: "POST",
                         }
                     );
-    
-    
+
+
                 if (!response.ok) {
                     throw new Error(
                         "Failed to refresh mobile leads"
                     );
                 }
-    
+
             }
-    
-    
+
+            if (activeTab === "marketing") {
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/api/mobile-ingestion/refresh`,
+                        {
+                            method: "POST",
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Failed to refresh marketing calls"
+                    );
+                }
+            }
+
+
             if (activeTab === "overview") {
-    
+
                 const [
                     webResponse,
                     mobileResponse,
                 ] = await Promise.all([
-    
+
                     fetch(
                         `${API_BASE_URL}/api/ingestion/refresh`,
                         {
                             method: "POST",
                         }
                     ),
-    
+
                     fetch(
                         `${API_BASE_URL}/api/mobile-ingestion/refresh`,
                         {
                             method: "POST",
                         }
                     ),
-    
+
                 ]);
-    
-    
+
+
                 if (
                     !webResponse.ok ||
                     !mobileResponse.ok
@@ -121,26 +141,26 @@ export default function App() {
                         "Failed to refresh overview data"
                     );
                 }
-    
+
             }
-    
-    
+
+
             setRefreshKey(
                 (current) =>
                     current + 1
             );
-    
+
         } catch (error) {
-    
+
             console.error(
                 "Refresh failed:",
                 error
             );
-    
+
         } finally {
-    
+
             setRefreshing(false);
-    
+
         }
     }
 
@@ -195,6 +215,16 @@ export default function App() {
                     activeTab === "mobile" &&
                     (
                         <MobileDashboard
+                            refreshKey={
+                                refreshKey
+                            }
+                        />
+                    )
+                }
+                {
+                    activeTab === "marketing" &&
+                    (
+                        <MarketingDashboard
                             refreshKey={
                                 refreshKey
                             }

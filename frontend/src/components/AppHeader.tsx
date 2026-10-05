@@ -4,7 +4,8 @@ import "./AppHeader.css";
 export type DashboardTab =
     | "overview"
     | "web"
-    | "mobile";
+    | "mobile"
+    | "marketing";
 
 
 type AppHeaderProps = {
@@ -139,8 +140,25 @@ export default function AppHeader({
                         }
 
                     </button>
+                    <button
+                        type="button"
+                        className={
+                            activeTab === "marketing"
+                                ? "app-nav-item active"
+                                : "app-nav-item"
+                        }
+                        onClick={() =>
+                            onTabChange(
+                                "marketing"
+                            )
+                        }
+                    >
+                        Marketing
+                    </button>
 
                 </nav>
+
+
 
 
                 {/* Refresh */}

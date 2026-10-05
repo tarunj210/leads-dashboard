@@ -18,7 +18,7 @@ SPREADSHEET_ID = "197kt7D6tNS8QIKYMX8Pv0iZgiiwbKdJSmh-mmaXzXuc"
 
 
 # Change "Data" if your tab name is different
-RANGE_NAME = "Data!A1:I62"
+RANGE_NAME = "Data!A1:I"
 
 
 # ---------------------------------------------------------

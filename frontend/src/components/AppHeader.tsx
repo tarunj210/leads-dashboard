@@ -3,7 +3,7 @@ import "./AppHeader.css";
 
 export type DashboardTab =
     | "overview"
-    | "Email"
+    | "web"
     | "mobile"
     | "marketing";
 
@@ -63,6 +63,7 @@ export default function AppHeader({
 
                 <nav className="app-header-nav">
 
+
                     <button
                         type="button"
                         className={
@@ -83,13 +84,13 @@ export default function AppHeader({
                     <button
                         type="button"
                         className={
-                            activeTab === "Email"
+                            activeTab === "web"
                                 ? "app-nav-item active"
                                 : "app-nav-item"
                         }
                         onClick={() =>
                             onTabChange(
-                                "Email"
+                                "web"
                             )
                         }
                     >
@@ -140,6 +141,8 @@ export default function AppHeader({
                         }
 
                     </button>
+
+
                     <button
                         type="button"
                         className={
@@ -156,9 +159,8 @@ export default function AppHeader({
                         Marketing
                     </button>
 
+
                 </nav>
-
-
 
 
                 {/* Refresh */}
@@ -175,13 +177,11 @@ export default function AppHeader({
                             refreshing
                         }
                     >
-
                         {
                             refreshing
                                 ? "Refreshing..."
                                 : "Refresh"
                         }
-
                     </button>
 
                 </div>

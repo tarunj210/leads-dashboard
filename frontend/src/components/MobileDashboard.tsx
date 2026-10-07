@@ -274,7 +274,8 @@ export default function MobileDashboard({
     ========================================= */
 
     async function loadCalls(
-        currentPage: number
+        currentPage: number,
+        append = false,
     ) {
 
         try {
@@ -307,7 +308,20 @@ export default function MobileDashboard({
 
 
             setCalls(
-                data.items
+                (
+                    current
+                ) =>
+                    append
+                        ? [
+                            ...current,
+                            ...data.items,
+                        ]
+                        : data.items
+            );
+
+
+            setPage(
+                currentPage
             );
 
 
@@ -327,19 +341,11 @@ export default function MobileDashboard({
                 err
             );
 
-
-            setError(
-                err instanceof Error
-                    ? err.message
-                    : "Failed to load mobile calls"
-            );
-
         } finally {
 
             setTableLoading(
                 false
             );
-
         }
     }
 
@@ -875,7 +881,6 @@ export default function MobileDashboard({
     useEffect(() => {
 
         if (!filterOptions) {
-
             return;
         }
 
@@ -889,7 +894,8 @@ export default function MobileDashboard({
 
 
         loadCalls(
-            1
+            1,
+            false
         );
 
     }, [
@@ -1346,7 +1352,7 @@ export default function MobileDashboard({
                             Calls
                         </h2>
 
-                
+
 
                     </div>
 
@@ -1605,7 +1611,6 @@ export default function MobileDashboard({
 
                 <div className="mobile-pagination">
 
-
                     <span className="mobile-pagination-summary">
 
                         Showing {
@@ -1617,64 +1622,29 @@ export default function MobileDashboard({
                     </span>
 
 
-                    <div className="mobile-pagination-actions">
-
-
-                        <button
-
-                            type="button"
-
-                            disabled={
-                                page <= 1
-                            }
-
-                            onClick={() =>
-
-                                setPage(
-                                    (
-                                        current
-                                    ) =>
-                                        current - 1
-                                )
-
-                            }
-
-                        >
-
-                            Previous
-
-                        </button>
-
-
-                        <button
-
-                            type="button"
-
-                            disabled={
-                                page >=
-                                totalPages
-                            }
-
-                            onClick={() =>
-
-                                setPage(
-                                    (
-                                        current
-                                    ) =>
-                                        current + 1
-                                )
-
-                            }
-
-                        >
-
-                            Next
-
-                        </button>
-
-
-                    </div>
-
+                    {
+                        page < totalPages &&
+                        (
+                            <button
+                                type="button"
+                                disabled={
+                                    tableLoading
+                                }
+                                onClick={() =>
+                                    loadCalls(
+                                        page + 1,
+                                        true
+                                    )
+                                }
+                            >
+                                {
+                                    tableLoading
+                                        ? "Loading..."
+                                        : "Load more"
+                                }
+                            </button>
+                        )
+                    }
 
                 </div>
 

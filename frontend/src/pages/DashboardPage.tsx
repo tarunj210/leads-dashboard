@@ -412,11 +412,6 @@ export default function DashboardPage({
             );
 
 
-            setAvailableDates(
-                data.available_dates
-            );
-
-
             setLeadsOverTime(
                 data.leads_over_time
             );

@@ -284,6 +284,10 @@ export default function MobileDashboard({
                 true
             );
 
+            setError(
+                null
+            );
+
 
             const data =
                 await fetchMobileCalls({
@@ -310,13 +314,43 @@ export default function MobileDashboard({
             setCalls(
                 (
                     current
-                ) =>
-                    append
-                        ? [
-                            ...current,
-                            ...data.items,
-                        ]
-                        : data.items
+                ) => {
+
+                    if (!append) {
+                        return data.items;
+                    }
+
+
+                    /*
+                     * Defensive duplicate check.
+                     *
+                     * Normally pages should not
+                     * overlap, but this prevents
+                     * duplicate rows if they do.
+                     */
+                    const existingIds =
+                        new Set(
+                            current.map(
+                                (call) =>
+                                    call.id
+                            )
+                        );
+
+
+                    const newItems =
+                        data.items.filter(
+                            (call) =>
+                                !existingIds.has(
+                                    call.id
+                                )
+                        );
+
+
+                    return [
+                        ...current,
+                        ...newItems,
+                    ];
+                }
             );
 
 
@@ -341,14 +375,21 @@ export default function MobileDashboard({
                 err
             );
 
+
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to load mobile calls"
+            );
+
         } finally {
 
             setTableLoading(
                 false
             );
+
         }
     }
-
 
     function exportMobileCallsToCsv() {
 
@@ -931,29 +972,7 @@ export default function MobileDashboard({
        Pagination
     ========================================= */
 
-    useEffect(() => {
 
-        if (!filterOptions) {
-
-            return;
-        }
-
-
-        if (
-            page === 1
-        ) {
-
-            return;
-        }
-
-
-        loadCalls(
-            page
-        );
-
-    }, [
-        page,
-    ]);
 
 
     /* =========================================
@@ -1625,34 +1644,11 @@ export default function MobileDashboard({
                     {
                         page < totalPages &&
                         (
-                            <button
-                                type="button"
-                                disabled={
-                                    tableLoading
-                                }
-                                onClick={() =>
-                                    loadCalls(
-                                        page + 1,
-                                        true
-                                    )
-                                }
-                            >
-                                {
-                                    tableLoading
-                                        ? "Loading..."
-                                        : "Load more"
-                                }
-                            </button>
-                        )
-                    }
+                            <div className="mobile-pagination-actions">
 
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-    );
-}
+                                <button
+                                    type="button"
+                                    disabled={
+                                        tableLoading
+                                    }
+                                    onClick={() =>

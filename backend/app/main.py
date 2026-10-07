@@ -22,6 +22,9 @@ from app.api.overview import (
 from app.api.marketing import (
     router as marketing_router,
 )
+from app.api.message import (
+    router as message_router,
+)
 
 
 app = FastAPI()
@@ -65,4 +68,7 @@ app.include_router(
 
 app.include_router(
     marketing_router
+)
+app.include_router(
+    message_router
 )

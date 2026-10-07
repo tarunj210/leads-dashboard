@@ -193,6 +193,8 @@ export default function AppHeader({
                         }
                         disabled={
                             refreshing
+                            || activeTab === "marketing"
+                            || activeTab === "message"
                         }
                     >
                         {

@@ -6,7 +6,9 @@ import pandas as pd
 from app.integrations.google_sheets import (
     get_sheets_service,
 )
-
+from googleapiclient.errors import (
+    HttpError,
+)
 # ---------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------
@@ -115,6 +117,9 @@ ROW_HASH_FIELDS = [
 
 
 
+
+
+
 def fetch_sheet_values(
     start_row: int,
 ) -> list[list]:
@@ -137,24 +142,54 @@ def fetch_sheet_values(
     )
 
 
-    result = (
-        service
-        .spreadsheets()
-        .values()
-        .get(
-            spreadsheetId=(
-                SPREADSHEET_ID
-            ),
-            range=range_name,
+    try:
+
+        result = (
+            service
+            .spreadsheets()
+            .values()
+            .get(
+                spreadsheetId=(
+                    SPREADSHEET_ID
+                ),
+                range=range_name,
+            )
+            .execute()
         )
-        .execute()
-    )
 
 
-    return result.get(
-        "values",
-        [],
-    )
+        return result.get(
+            "values",
+            [],
+        )
+
+
+    except HttpError as exc:
+
+        if exc.resp.status == 400:
+
+            error_text = str(
+                exc
+            )
+
+
+            if (
+                "exceeds grid limits"
+                in error_text
+            ):
+
+                print(
+                    "MOBILE start row is beyond "
+                    "current sheet size. "
+                    "No new rows found.",
+                    flush=True,
+                )
+
+
+                return []
+
+
+        raise
 
 # ---------------------------------------------------------
 # Create dataframe

@@ -174,14 +174,6 @@ export default function MobileDashboard({
             }
 
 
-            /*
-             * Only initialise the duration
-             * when the dashboard first loads.
-             *
-             * This prevents a header refresh
-             * from resetting a duration filter
-             * selected by the user.
-             */
             if (!filterOptions) {
 
                 setMinDuration(
@@ -219,6 +211,7 @@ export default function MobileDashboard({
             setLoading(
                 true
             );
+
 
             setError(
                 null
@@ -264,7 +257,6 @@ export default function MobileDashboard({
             setLoading(
                 false
             );
-
         }
     }
 
@@ -283,6 +275,7 @@ export default function MobileDashboard({
             setTableLoading(
                 true
             );
+
 
             setError(
                 null
@@ -316,17 +309,22 @@ export default function MobileDashboard({
                     current
                 ) => {
 
+                    /*
+                     * First page / filter change:
+                     * replace existing table.
+                     */
                     if (!append) {
+
                         return data.items;
                     }
 
 
                     /*
-                     * Defensive duplicate check.
+                     * Load more:
+                     * append the next page.
                      *
-                     * Normally pages should not
-                     * overlap, but this prevents
-                     * duplicate rows if they do.
+                     * Use IDs to protect against
+                     * accidental duplicates.
                      */
                     const existingIds =
                         new Set(
@@ -387,9 +385,13 @@ export default function MobileDashboard({
             setTableLoading(
                 false
             );
-
         }
     }
+
+
+    /* =========================================
+       Export currently loaded rows
+    ========================================= */
 
     function exportMobileCallsToCsv() {
 
@@ -429,7 +431,10 @@ export default function MobileDashboard({
         ) => {
 
             const text =
-                String(value);
+                String(
+                    value
+                );
+
 
             return `"${text.replace(
                 /"/g,
@@ -458,7 +463,9 @@ export default function MobileDashboard({
 
         const blob =
             new Blob(
-                [csvContent],
+                [
+                    csvContent
+                ],
                 {
                     type:
                         "text/csv;charset=utf-8;",
@@ -480,6 +487,7 @@ export default function MobileDashboard({
 
         link.href =
             url;
+
 
         link.download =
             "mobile-calls.csv";
@@ -516,17 +524,12 @@ export default function MobileDashboard({
                 true
             );
 
+
             setError(
                 null
             );
 
 
-            /*
-             * Refresh the available date metadata.
-             *
-             * We deliberately do not reset the
-             * currently selected filters.
-             */
             const options =
                 await fetchMobileFilterOptions();
 
@@ -536,12 +539,8 @@ export default function MobileDashboard({
             );
 
 
-            const [
-                summaryData,
-                callsData,
-            ] = await Promise.all([
-
-                fetchMobileSummary({
+            const summaryData =
+                await fetchMobileSummary({
 
                     startDate:
                         startDate ||
@@ -553,29 +552,7 @@ export default function MobileDashboard({
 
                     minDuration,
 
-                }),
-
-
-                fetchMobileCalls({
-
-                    startDate:
-                        startDate ||
-                        undefined,
-
-                    endDate:
-                        endDate ||
-                        undefined,
-
-                    minDuration,
-
-                    page,
-
-                    pageSize:
-                        25,
-
-                }),
-
-            ]);
+                });
 
 
             setSummary(
@@ -583,18 +560,18 @@ export default function MobileDashboard({
             );
 
 
-            setCalls(
-                callsData.items
+            /*
+             * Refresh should restart the
+             * cumulative table from page 1.
+             */
+            setPage(
+                1
             );
 
 
-            setTotalPages(
-                callsData.total_pages
-            );
-
-
-            setTotalCalls(
-                callsData.total
+            await loadCalls(
+                1,
+                false
             );
 
         } catch (err) {
@@ -616,11 +593,6 @@ export default function MobileDashboard({
             setLoading(
                 false
             );
-
-            setTableLoading(
-                false
-            );
-
         }
     }
 
@@ -662,7 +634,7 @@ export default function MobileDashboard({
 
 
     /* =========================================
-       Formatting Helpers
+       Formatting helpers
     ========================================= */
 
     function formatDuration(
@@ -713,7 +685,9 @@ export default function MobileDashboard({
             hours > 0
         ) {
 
-            return `${hours}h ${minutes}m`;
+            return (
+                `${hours}h ${minutes}m`
+            );
         }
 
 
@@ -721,16 +695,20 @@ export default function MobileDashboard({
             minutes > 0
         ) {
 
-            return `${minutes}m ${remainingSeconds
-                .toString()
-                .padStart(
-                    2,
-                    "0"
-                )}s`;
+            return (
+                `${minutes}m ${remainingSeconds
+                    .toString()
+                    .padStart(
+                        2,
+                        "0"
+                    )}s`
+            );
         }
 
 
-        return `${remainingSeconds}s`;
+        return (
+            `${remainingSeconds}s`
+        );
     }
 
 
@@ -745,107 +723,135 @@ export default function MobileDashboard({
 
 
         const digits =
-            String(value).replace(
+            String(
+                value
+            ).replace(
                 /\D/g,
                 ""
             );
 
 
-        // =====================================
-        // International Australian mobile
-        // 61426543786 -> +61 426 543 786
-        // =====================================
-
+        // International mobile
         if (
-            digits.startsWith("614") &&
+            digits.startsWith(
+                "614"
+            ) &&
             digits.length === 11
         ) {
 
             return (
-                `+61 ${digits.slice(2, 5)} ` +
-                `${digits.slice(5, 8)} ` +
-                `${digits.slice(8)}`
+                `+61 ${digits.slice(
+                    2,
+                    5
+                )} ` +
+                `${digits.slice(
+                    5,
+                    8
+                )} ` +
+                `${digits.slice(
+                    8
+                )}`
             );
         }
 
 
-        // =====================================
-        // International Australian landline
-        // 61292659121 -> +61 2 9265 9121
-        // =====================================
-
+        // International landline
         if (
-            digits.startsWith("61") &&
+            digits.startsWith(
+                "61"
+            ) &&
             digits.length === 11
         ) {
 
             return (
-                `+61 ${digits.slice(2, 3)} ` +
-                `${digits.slice(3, 7)} ` +
-                `${digits.slice(7)}`
+                `+61 ${digits.slice(
+                    2,
+                    3
+                )} ` +
+                `${digits.slice(
+                    3,
+                    7
+                )} ` +
+                `${digits.slice(
+                    7
+                )}`
             );
         }
 
 
-        // =====================================
-        // Australian local mobile
-        // 0426543786 -> +61 426 543 786
-        // =====================================
-
+        // Local mobile
         if (
-            digits.startsWith("04") &&
+            digits.startsWith(
+                "04"
+            ) &&
             digits.length === 10
         ) {
 
             return (
-                `+61 ${digits.slice(1, 4)} ` +
-                `${digits.slice(4, 7)} ` +
-                `${digits.slice(7)}`
+                `+61 ${digits.slice(
+                    1,
+                    4
+                )} ` +
+                `${digits.slice(
+                    4,
+                    7
+                )} ` +
+                `${digits.slice(
+                    7
+                )}`
             );
         }
 
 
-        // =====================================
-        // Australian local landline
-        // 0292659121 -> +61 2 9265 9121
-        // =====================================
-
+        // Local landline
         if (
-            digits.startsWith("0") &&
+            digits.startsWith(
+                "0"
+            ) &&
             digits.length === 10
         ) {
 
             return (
-                `+61 ${digits.slice(1, 2)} ` +
-                `${digits.slice(2, 6)} ` +
-                `${digits.slice(6)}`
+                `+61 ${digits.slice(
+                    1,
+                    2
+                )} ` +
+                `${digits.slice(
+                    2,
+                    6
+                )} ` +
+                `${digits.slice(
+                    6
+                )}`
             );
         }
 
 
-        // =====================================
-        // Leading zero lost - mobile
-        // 426543786 -> +61 426 543 786
-        // =====================================
-
+        // Mobile missing leading zero
         if (
-            digits.startsWith("4") &&
+            digits.startsWith(
+                "4"
+            ) &&
             digits.length === 9
         ) {
 
             return (
-                `+61 ${digits.slice(0, 3)} ` +
-                `${digits.slice(3, 6)} ` +
-                `${digits.slice(6)}`
+                `+61 ${digits.slice(
+                    0,
+                    3
+                )} ` +
+                `${digits.slice(
+                    3,
+                    6
+                )} ` +
+                `${digits.slice(
+                    6
+                )}`
             );
         }
 
 
-        // =====================================
-        // Leading zero lost - landline
-        // 292659121 -> +61 2 9265 9121
-        // =====================================
-
+        // Landline missing leading zero
         if (
             /^[2378]/.test(
                 digits
@@ -854,9 +860,17 @@ export default function MobileDashboard({
         ) {
 
             return (
-                `+61 ${digits.slice(0, 1)} ` +
-                `${digits.slice(1, 5)} ` +
-                `${digits.slice(5)}`
+                `+61 ${digits.slice(
+                    0,
+                    1
+                )} ` +
+                `${digits.slice(
+                    1,
+                    5
+                )} ` +
+                `${digits.slice(
+                    5
+                )}`
             );
         }
 
@@ -908,71 +922,77 @@ export default function MobileDashboard({
        Initial filter load
     ========================================= */
 
-    useEffect(() => {
+    useEffect(
+        () => {
 
-        loadFilterOptions();
+            loadFilterOptions();
 
-    }, []);
+        },
+        []
+    );
 
 
     /* =========================================
        Filter changes
     ========================================= */
 
-    useEffect(() => {
+    useEffect(
+        () => {
 
-        if (!filterOptions) {
-            return;
-        }
-
-
-        loadSummary();
+            if (!filterOptions) {
+                return;
+            }
 
 
-        setPage(
-            1
-        );
+            loadSummary();
 
 
-        loadCalls(
-            1,
-            false
-        );
+            /*
+             * Filter changes always reset
+             * cumulative pagination.
+             */
+            setPage(
+                1
+            );
 
-    }, [
-        startDate,
-        endDate,
-        minDuration,
-    ]);
+
+            loadCalls(
+                1,
+                false
+            );
+
+        },
+        [
+            startDate,
+            endDate,
+            minDuration,
+        ]
+    );
 
 
     /* =========================================
        Header refresh
     ========================================= */
 
-    useEffect(() => {
+    useEffect(
+        () => {
 
-        if (
-            refreshKey === 0 ||
-            !filterOptions
-        ) {
+            if (
+                refreshKey === 0 ||
+                !filterOptions
+            ) {
 
-            return;
-        }
-
-
-        reloadAfterHeaderRefresh();
-
-    }, [
-        refreshKey,
-    ]);
+                return;
+            }
 
 
-    /* =========================================
-       Pagination
-    ========================================= */
+            reloadAfterHeaderRefresh();
 
-
+        },
+        [
+            refreshKey,
+        ]
+    );
 
 
     /* =========================================
@@ -995,7 +1015,6 @@ export default function MobileDashboard({
                 </p>
 
             </div>
-
         );
     }
 
@@ -1026,22 +1045,19 @@ export default function MobileDashboard({
                 </div>
 
             </div>
-
         );
     }
 
 
     /* =========================================
-       Duration scale for table bars
+       Duration scale
     ========================================= */
 
     const maxVisibleDuration =
         Math.max(
 
             ...calls.map(
-                (
-                    call
-                ) =>
+                (call) =>
                     call.billed_duration
                     ?? 0
             ),
@@ -1099,10 +1115,6 @@ export default function MobileDashboard({
                         value
                     );
 
-
-                    setPage(
-                        1
-                    );
                 }}
 
                 onEndDateChange={(
@@ -1113,10 +1125,6 @@ export default function MobileDashboard({
                         value
                     );
 
-
-                    setPage(
-                        1
-                    );
                 }}
 
                 onMinDurationChange={(
@@ -1127,10 +1135,6 @@ export default function MobileDashboard({
                         value
                     );
 
-
-                    setPage(
-                        1
-                    );
                 }}
 
                 onClearFilters={
@@ -1141,18 +1145,20 @@ export default function MobileDashboard({
 
 
             {/* =================================
-                Dashboard Status
+                Dashboard state
             ================================= */}
 
             {
                 loading &&
                 summary &&
                 (
+
                     <p className="mobile-dashboard-updating">
 
                         Updating dashboard...
 
                     </p>
+
                 )
             }
 
@@ -1161,17 +1167,19 @@ export default function MobileDashboard({
                 error &&
                 summary &&
                 (
+
                     <p className="mobile-dashboard-inline-error">
 
                         {error}
 
                     </p>
+
                 )
             }
 
 
             {/* =================================
-                KPI Cards
+                KPI cards
             ================================= */}
 
             {
@@ -1181,15 +1189,12 @@ export default function MobileDashboard({
                     <div className="mobile-metric-grid">
 
 
-                        {/* Calls */}
-
                         <MetricCard
 
                             title="Calls"
 
                             value={
-                                summary
-                                    .total_calls
+                                summary.total_calls
                             }
 
                             subtitle={
@@ -1199,28 +1204,21 @@ export default function MobileDashboard({
                         />
 
 
-                        {/* Unique Callers */}
-
                         <MetricCard
 
                             title="Unique callers"
 
                             value={
-                                summary
-                                    .unique_cli
+                                summary.unique_cli
                             }
 
                             subtitle={
 
-                                summary
-                                    .total_calls >
-                                    summary
-                                        .unique_cli
+                                summary.total_calls >
+                                summary.unique_cli
 
-                                    ? `${summary
-                                        .total_calls -
-                                    summary
-                                        .unique_cli
+                                    ? `${summary.total_calls -
+                                        summary.unique_cli
                                     } called more than once`
 
                                     : "No repeat callers"
@@ -1230,40 +1228,29 @@ export default function MobileDashboard({
                         />
 
 
-                        {/* Talk Time */}
-
                         <MetricCard
 
                             title="Talk time"
 
                             value={
-
                                 formatDuration(
                                     summary
                                         .total_duration_seconds
                                 )
-
                             }
 
                             subtitle={
 
-                                summary
-                                    .total_calls > 0
+                                summary.total_calls > 0
 
                                     ? `Avg ${formatDuration(
-
                                         Math.round(
-
                                             summary
                                                 .total_duration_seconds /
-
                                             summary
                                                 .total_calls
-
                                         )
-
-                                    )
-                                    } per call`
+                                    )} per call`
 
                                     : "No call duration"
 
@@ -1272,35 +1259,27 @@ export default function MobileDashboard({
                         />
 
 
-                        {/* Call Cost */}
-
                         <MetricCard
 
                             title="Call cost"
 
                             value={
-
                                 `$${summary
                                     .total_cost
                                     .toFixed(
                                         2
                                     )}`
-
                             }
 
                             subtitle={
 
-                                summary
-                                    .total_calls > 0
+                                summary.total_calls > 0
 
                                     ? `Avg $${(
-
                                         summary
                                             .total_cost /
-
                                         summary
                                             .total_calls
-
                                     ).toFixed(
                                         2
                                     )} per call`
@@ -1311,8 +1290,6 @@ export default function MobileDashboard({
 
                         />
 
-
-                        {/* Tracking Number */}
 
                         <MetricCard
 
@@ -1353,17 +1330,14 @@ export default function MobileDashboard({
 
 
             {/* =================================
-                Calls Table
+                Calls table
             ================================= */}
 
             <div className="mobile-table-card">
 
 
-                {/* =============================
-                    Table Header
-                ============================= */}
-
                 <div className="mobile-table-header">
+
 
                     <div>
 
@@ -1371,30 +1345,39 @@ export default function MobileDashboard({
                             Calls
                         </h2>
 
-
-
                     </div>
 
 
                     <button
+
                         type="button"
+
                         className="mobile-export-button"
+
                         onClick={
                             exportMobileCallsToCsv
                         }
+
                         disabled={
                             calls.length === 0
                         }
+
                     >
+
                         ↓&nbsp;&nbsp;Export CSV
+
                     </button>
+
 
                 </div>
 
 
-                {/* =============================
-                    Loading
-                ============================= */}
+                {/* =================================
+                    Loading indicator
+
+                    Important:
+                    table stays visible underneath.
+                ================================= */}
 
                 {
                     tableLoading &&
@@ -1402,221 +1385,11 @@ export default function MobileDashboard({
 
                         <div className="mobile-table-loading">
 
-                            Loading calls...
-
-                        </div>
-
-                    )
-                }
-
-
-                {/* =============================
-                    Table
-                ============================= */}
-
-                {
-                    !tableLoading &&
-                    (
-
-                        <div className="mobile-table-scroll">
-
-
-                            <table className="mobile-table">
-
-
-                                <thead>
-
-                                    <tr>
-
-                                        <th>
-                                            Connected ↑
-                                        </th>
-
-                                        <th>
-                                            Caller
-                                        </th>
-
-                                        <th>
-                                            Duration
-                                        </th>
-
-                                        <th>
-                                            Cost
-                                        </th>
-
-                                        <th
-                                            aria-label="Details"
-                                            className="mobile-details-column"
-                                        />
-
-                                    </tr>
-
-                                </thead>
-
-
-                                <tbody>
-
-                                    {
-                                        calls.length === 0
-
-                                            ? (
-
-                                                <tr>
-
-                                                    <td
-                                                        colSpan={
-                                                            5
-                                                        }
-                                                        className="mobile-table-empty"
-                                                    >
-
-                                                        No calls found for the selected filters.
-
-                                                    </td>
-
-                                                </tr>
-
-                                            )
-
-                                            : (
-
-                                                calls.map(
-                                                    (
-                                                        call
-                                                    ) => {
-
-
-                                                        const duration =
-                                                            call
-                                                                .billed_duration
-                                                            ?? 0;
-
-
-                                                        const durationWidth =
-                                                            Math.max(
-
-                                                                (
-                                                                    duration /
-                                                                    maxVisibleDuration
-                                                                ) *
-                                                                100,
-
-                                                                3
-
-                                                            );
-
-
-                                                        return (
-
-                                                            <tr
-                                                                key={
-                                                                    call.id
-                                                                }
-                                                            >
-
-
-                                                                {/* Connected */}
-
-                                                                <td className="mobile-connected-cell">
-
-                                                                    {
-                                                                        formatConnectedTime(
-                                                                            call.connect_time
-                                                                        )
-                                                                    }
-
-                                                                </td>
-
-
-                                                                {/* Caller */}
-
-                                                                <td className="mobile-caller-cell">
-
-                                                                    {
-                                                                        formatAustralianPhone(
-                                                                            call.cli
-                                                                        )
-                                                                    }
-
-                                                                </td>
-
-
-                                                                {/* Duration */}
-
-                                                                <td>
-
-                                                                    <div className="mobile-duration-cell">
-
-
-                                                                        <div className="mobile-duration-track">
-
-                                                                            <div
-                                                                                className="mobile-duration-bar"
-                                                                                style={{
-                                                                                    width:
-                                                                                        `${durationWidth}%`,
-                                                                                }}
-                                                                            />
-
-                                                                        </div>
-
-
-                                                                        <span className="mobile-duration-value">
-
-                                                                            {
-                                                                                formatDuration(
-                                                                                    call.billed_duration
-                                                                                )
-                                                                            }
-
-                                                                        </span>
-
-
-                                                                    </div>
-
-                                                                </td>
-
-
-                                                                {/* Cost */}
-
-                                                                <td className="mobile-cost-cell">
-
-                                                                    {
-                                                                        call.cost !== null
-
-                                                                            ? `$${call.cost.toFixed(
-                                                                                2
-                                                                            )}`
-
-                                                                            : "-"
-                                                                    }
-
-                                                                </td>
-
-
-                                                                {/* Details */}
-
-                                                                <td className="mobile-row-chevron">
-
-                                                                    ›
-
-                                                                </td>
-
-
-                                                            </tr>
-
-                                                        );
-                                                    }
-                                                )
-
-                                            )
-                                    }
-
-                                </tbody>
-
-
-                            </table>
-
+                            {
+                                calls.length > 0
+                                    ? "Loading more calls..."
+                                    : "Loading calls..."
+                            }
 
                         </div>
 
@@ -1625,30 +1398,315 @@ export default function MobileDashboard({
 
 
                 {/* =================================
-                    Pagination
+                    Table
+
+                    Do NOT wrap this in
+                    !tableLoading.
+                ================================= */}
+
+                <div className="mobile-table-scroll">
+
+
+                    <table className="mobile-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Connected ↑
+                                </th>
+
+                                <th>
+                                    Caller
+                                </th>
+
+                                <th>
+                                    Duration
+                                </th>
+
+                                <th>
+                                    Cost
+                                </th>
+
+                                <th
+                                    aria-label="Details"
+                                    className="mobile-details-column"
+                                />
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {
+                                calls.length === 0
+
+                                    ? (
+
+                                        <tr>
+
+                                            <td
+
+                                                colSpan={
+                                                    5
+                                                }
+
+                                                className="mobile-table-empty"
+
+                                            >
+
+                                                {
+                                                    tableLoading
+                                                        ? "Loading calls..."
+                                                        : "No calls found for the selected filters."
+                                                }
+
+                                            </td>
+
+                                        </tr>
+
+                                    )
+
+                                    : (
+
+                                        calls.map(
+                                            (
+                                                call
+                                            ) => {
+
+
+                                                const duration =
+                                                    call
+                                                        .billed_duration
+                                                    ?? 0;
+
+
+                                                const durationWidth =
+                                                    Math.max(
+
+                                                        (
+                                                            duration /
+                                                            maxVisibleDuration
+                                                        ) *
+                                                        100,
+
+                                                        3
+
+                                                    );
+
+
+                                                return (
+
+                                                    <tr
+                                                        key={
+                                                            call.id
+                                                        }
+                                                    >
+
+
+                                                        <td className="mobile-connected-cell">
+
+                                                            {
+                                                                formatConnectedTime(
+                                                                    call.connect_time
+                                                                )
+                                                            }
+
+                                                        </td>
+
+
+                                                        <td className="mobile-caller-cell">
+
+                                                            {
+                                                                formatAustralianPhone(
+                                                                    call.cli
+                                                                )
+                                                            }
+
+                                                        </td>
+
+
+                                                        <td>
+
+                                                            <div className="mobile-duration-cell">
+
+
+                                                                <div className="mobile-duration-track">
+
+                                                                    <div
+
+                                                                        className="mobile-duration-bar"
+
+                                                                        style={{
+
+                                                                            width:
+                                                                                `${durationWidth}%`,
+
+                                                                        }}
+
+                                                                    />
+
+                                                                </div>
+
+
+                                                                <span className="mobile-duration-value">
+
+                                                                    {
+                                                                        formatDuration(
+                                                                            call.billed_duration
+                                                                        )
+                                                                    }
+
+                                                                </span>
+
+
+                                                            </div>
+
+                                                        </td>
+
+
+                                                        <td className="mobile-cost-cell">
+
+                                                            {
+                                                                call.cost !== null
+
+                                                                    ? `$${call.cost.toFixed(
+                                                                        2
+                                                                    )}`
+
+                                                                    : "-"
+                                                            }
+
+                                                        </td>
+
+
+                                                        <td className="mobile-row-chevron">
+
+                                                            ›
+
+                                                        </td>
+
+
+                                                    </tr>
+
+                                                );
+                                            }
+                                        )
+
+                                    )
+                            }
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+                {/* =================================
+                    Cumulative pagination
                 ================================= */}
 
                 <div className="mobile-pagination">
 
+
                     <span className="mobile-pagination-summary">
 
-                        Showing {
+                        Showing{" "}
+
+                        {
                             calls.length
-                        } of {
+                        }
+
+                        {" "}of{" "}
+
+                        {
                             totalCalls
-                        } calls
+                        }
+
+                        {" "}calls
 
                     </span>
 
 
                     {
-                        page < totalPages &&
-                        (
-                            <div className="mobile-pagination-actions">
+                        page < totalPages
+                            ? (
 
-                                <button
-                                    type="button"
-                                    disabled={
-                                        tableLoading
-                                    }
-                                    onClick={() =>
+                                <div className="mobile-pagination-actions">
+
+
+                                    <button
+
+                                        type="button"
+
+                                        disabled={
+                                            tableLoading
+                                        }
+
+                                        onClick={() => {
+
+                                            if (
+                                                tableLoading
+                                            ) {
+                                                return;
+                                            }
+
+
+                                            loadCalls(
+                                                page + 1,
+                                                true
+                                            );
+
+                                        }}
+
+                                    >
+
+                                        {
+                                            tableLoading
+                                                ? "Loading..."
+                                                : "Load more"
+                                        }
+
+                                    </button>
+
+
+                                </div>
+
+                            )
+
+                            : (
+
+                                totalCalls > 0 &&
+                                (
+
+                                    <span className="mobile-pagination-summary">
+
+                                        All calls loaded
+
+                                    </span>
+
+                                )
+
+                            )
+                    }
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    );
+}

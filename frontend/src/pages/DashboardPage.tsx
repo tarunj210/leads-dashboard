@@ -92,12 +92,7 @@ export default function DashboardPage({
     });
 
 
-    const [
-        availableDates,
-        setAvailableDates,
-    ] = useState<
-        string[]
-    >([]);
+    
 
 
     // =========================================

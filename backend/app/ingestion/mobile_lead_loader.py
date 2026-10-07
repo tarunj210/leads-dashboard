@@ -14,11 +14,11 @@ from app.integrations.google_sheets import (
 
 
 # Replace with mobile spreadsheet ID
-SPREADSHEET_ID = "197kt7D6tNS8QIKYMX8Pv0iZgiiwbKdJSmh-mmaXzXuc"
+SPREADSHEET_ID = "1FcrdMIsLXWx30tuo0EhFnMqw2JJsiDznT24kNpHt_2g"
 
 
 # Change "Data" if your tab name is different
-RANGE_NAME = "Data!A:I"
+SHEET_NAME = "Data"
 
 
 # ---------------------------------------------------------
@@ -36,6 +36,18 @@ REQUIRED_COLUMNS = {
     "Result",
     "Cost",
 }
+
+SHEET_COLUMNS = [
+    "AccessList",
+    "Remote Ip",
+    "Connect Time",
+    "CLI",
+    "CLD",
+    "Prefix",
+    "Billed Duration",
+    "Result",
+    "Cost",
+]
 
 
 # ---------------------------------------------------------
@@ -103,25 +115,46 @@ ROW_HASH_FIELDS = [
 
 
 
-def fetch_sheet_values() -> list[list]:
+def fetch_sheet_values(
+    start_row: int,
+) -> list[list]:
 
-    service = get_sheets_service()
+    service = (
+        get_sheets_service()
+    )
+
+
+    range_name = (
+        f"{SHEET_NAME}!"
+        f"A{start_row}:I"
+    )
+
+
+    print(
+        f"MOBILE fetching range: "
+        f"{range_name}",
+        flush=True,
+    )
+
 
     result = (
-        service.spreadsheets()
+        service
+        .spreadsheets()
         .values()
         .get(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME,
+            spreadsheetId=(
+                SPREADSHEET_ID
+            ),
+            range=range_name,
         )
         .execute()
     )
+
 
     return result.get(
         "values",
         [],
     )
-
 
 # ---------------------------------------------------------
 # Create dataframe
@@ -132,31 +165,21 @@ def create_dataframe(
 ) -> pd.DataFrame:
 
     if not values:
-        return pd.DataFrame()
 
-
-    # Mobile spreadsheet currently assumes
-    # the first row contains the headers.
-    #
-    # If your headers are on row 2 instead,
-    # change this to:
-    #
-    # headers = values[1]
-    # rows = values[2:]
-
-    headers = values[0]
-
-    rows = values[1:]
+        return pd.DataFrame(
+            columns=SHEET_COLUMNS
+        )
 
 
     column_count = len(
-        headers
+        SHEET_COLUMNS
     )
+
 
     normalized_rows = []
 
 
-    for row in rows:
+    for row in values:
 
         normalized_row = (
             row
@@ -165,6 +188,7 @@ def create_dataframe(
                 - len(row)
             )
         )
+
 
         normalized_rows.append(
             normalized_row[
@@ -175,7 +199,7 @@ def create_dataframe(
 
     return pd.DataFrame(
         normalized_rows,
-        columns=headers,
+        columns=SHEET_COLUMNS,
     )
 
 
@@ -665,16 +689,17 @@ def add_hashes(
 # Main ingestion loader
 # ---------------------------------------------------------
 
-def load_valid_mobile_leads() -> pd.DataFrame:
+def load_valid_mobile_leads(start_row: int,):
 
-    values = (
-        fetch_sheet_values()
-    )
+    values = fetch_sheet_values(start_row)
 
 
     if not values:
-        return pd.DataFrame()
 
+        return (
+            pd.DataFrame(),
+            0,
+        )
 
     df = create_dataframe(
         values
@@ -724,7 +749,10 @@ def load_valid_mobile_leads() -> pd.DataFrame:
     )
 
 
-    return valid_df
+    return (
+    valid_df,
+    len(values),
+)
 
 
 # ---------------------------------------------------------

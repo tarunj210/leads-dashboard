@@ -1,125 +1,316 @@
 import pandas as pd
 
-from app.database import SessionLocal
+from app.database import (
+    SessionLocal,
+)
+
 from app.ingestion.mobile_lead_loader import (
     load_valid_mobile_leads,
 )
 
 from app.repositories.mobile_lead_repository import (
+    get_existing_mobile_leads,
     sync_mobile_lead,
 )
 
+from app.repositories.ingestion_state_repository import (
+    MOBILE_SOURCE,
+    get_or_create_ingestion_state,
+)
 
-def database_value(value):
-    if pd.isna(value):
+
+def database_value(
+    value,
+):
+    if pd.isna(
+        value
+    ):
         return None
 
     return value
 
 
-def row_to_mobile_lead_data(row):
+def row_to_mobile_lead_data(
+    row,
+):
     return {
-        "lead_key": row["lead_key"],
-        "row_hash": row["row_hash"],
+        "lead_key": row[
+            "lead_key"
+        ],
+
+        "row_hash": row[
+            "row_hash"
+        ],
 
         "access_list": database_value(
-            row["access_list"]
+            row[
+                "access_list"
+            ]
         ),
 
         "remote_ip": database_value(
-            row["remote_ip"]
+            row[
+                "remote_ip"
+            ]
         ),
 
         "connect_time": database_value(
-            row["connect_time"]
+            row[
+                "connect_time"
+            ]
         ),
 
         "cli": database_value(
-            row["cli"]
+            row[
+                "cli"
+            ]
         ),
 
         "cld": database_value(
-            row["cld"]
+            row[
+                "cld"
+            ]
         ),
 
         "prefix": database_value(
-            row["prefix"]
+            row[
+                "prefix"
+            ]
         ),
 
         "billed_duration": database_value(
-            row["billed_duration"]
+            row[
+                "billed_duration"
+            ]
         ),
 
         "result": database_value(
-            row["result"]
+            row[
+                "result"
+            ]
         ),
 
         "cost": database_value(
-            row["cost"]
+            row[
+                "cost"
+            ]
         ),
     }
 
 
 def sync_mobile_leads():
-    print("MOBILE 1: service started", flush=True)
-
-    valid_df = load_valid_mobile_leads()
 
     print(
-        f"MOBILE 2: loader returned {len(valid_df)} rows",
+        "MOBILE 1: service started",
         flush=True,
     )
 
+
     stats = {
+        "fetched": 0,
         "inserted": 0,
         "updated": 0,
         "skipped": 0,
     }
 
-    if valid_df.empty:
-        return stats
-
-    print("MOBILE 3: opening DB session", flush=True)
 
     with SessionLocal() as db:
 
         try:
-            print("MOBILE 4: starting row sync", flush=True)
 
-            for index, (_, row) in enumerate(
-                valid_df.iterrows(),
-                start=1,
-            ):
-                mobile_lead_data = (
-                    row_to_mobile_lead_data(row)
-                )
-
-                result = sync_mobile_lead(
+            # Mobile sheet:
+            # row 1 = header
+            state = (
+                get_or_create_ingestion_state(
                     db,
-                    mobile_lead_data,
+                    source=MOBILE_SOURCE,
+                    initial_last_processed_row=1,
                 )
+            )
 
-                stats[result] += 1
 
-                if index % 100 == 0:
-                    print(
-                        f"MOBILE processed {index}",
-                        flush=True,
-                    )
+            start_row = (
+                state.last_processed_row
+                + 1
+            )
 
-            print("MOBILE 5: committing", flush=True)
 
-            db.commit()
-
-            print("MOBILE 6: commit complete", flush=True)
-
-        except Exception as exc:
             print(
-                f"MOBILE ERROR: {repr(exc)}",
+                "MOBILE checkpoint:",
+                state.last_processed_row,
                 flush=True,
             )
 
-            db.rollback()
-            raise
 
-    return stats
+            print(
+                "MOBILE starting row:",
+                start_row,
+                flush=True,
+            )
+
+
+            (
+                valid_df,
+                fetched_count,
+            ) = (
+                load_valid_mobile_leads(
+                    start_row
+                )
+            )
+
+
+            stats[
+                "fetched"
+            ] = fetched_count
+
+
+            # ---------------------------------
+            # Nothing new in Google Sheet
+            # ---------------------------------
+
+            if fetched_count == 0:
+
+                db.commit()
+
+                print(
+                    "MOBILE no new rows found",
+                    flush=True,
+                )
+
+                return stats
+
+
+            print(
+                f"MOBILE fetched "
+                f"{fetched_count} sheet rows",
+                flush=True,
+            )
+
+
+            print(
+                f"MOBILE valid rows: "
+                f"{len(valid_df)}",
+                flush=True,
+            )
+
+
+            # ---------------------------------
+            # Convert dataframe rows
+            # into database-ready dictionaries
+            # ---------------------------------
+
+            mobile_leads_data = [
+                row_to_mobile_lead_data(
+                    row
+                )
+                for _, row
+                in valid_df.iterrows()
+            ]
+
+
+            # ---------------------------------
+            # Extract incoming lead keys
+            # ---------------------------------
+
+            lead_keys = [
+                item[
+                    "lead_key"
+                ]
+                for item
+                in mobile_leads_data
+            ]
+
+
+            print(
+                f"MOBILE checking "
+                f"{len(lead_keys)} lead keys",
+                flush=True,
+            )
+
+
+            # ---------------------------------
+            # One/few batched DB queries
+            # instead of one query per row
+            # ---------------------------------
+
+            existing_map = (
+                get_existing_mobile_leads(
+                    db,
+                    lead_keys,
+                )
+            )
+
+
+            print(
+                f"MOBILE found "
+                f"{len(existing_map)} existing records",
+                flush=True,
+            )
+
+
+            # ---------------------------------
+            # Sync in memory
+            # ---------------------------------
+
+            for mobile_lead_data in (
+                mobile_leads_data
+            ):
+
+                result = (
+                    sync_mobile_lead(
+                        db,
+                        mobile_lead_data,
+                        existing_map,
+                    )
+                )
+
+
+                stats[
+                    result
+                ] += 1
+
+
+            # ---------------------------------
+            # Advance checkpoint by actual
+            # Sheet rows fetched
+            # ---------------------------------
+
+            state.last_processed_row = (
+                state.last_processed_row
+                + fetched_count
+            )
+
+
+            print(
+                "MOBILE committing changes",
+                flush=True,
+            )
+
+
+            db.commit()
+
+
+            print(
+                "MOBILE committed. "
+                f"Checkpoint is now "
+                f"{state.last_processed_row}",
+                flush=True,
+            )
+
+
+            return stats
+
+
+        except Exception as exc:
+
+            db.rollback()
+
+
+            print(
+                f"MOBILE ERROR: "
+                f"{repr(exc)}",
+                flush=True,
+            )
+
+
+            raise

@@ -1,125 +1,330 @@
 import pandas as pd
 
-from app.database import SessionLocal
-from app.ingestion.lead_loader import load_valid_leads
-from app.repositories.lead_repository import sync_lead
+from app.database import (
+    SessionLocal,
+)
+
+from app.ingestion.lead_loader import (
+    load_valid_leads,
+)
+
+from app.repositories.lead_repository import (
+    get_existing_leads,
+    sync_lead,
+)
+
+from app.repositories.ingestion_state_repository import (
+    WEB_SOURCE,
+    get_or_create_ingestion_state,
+)
 
 
-def database_value(value):
-    if pd.isna(value):
+def database_value(
+    value,
+):
+    if pd.isna(
+        value
+    ):
         return None
 
     return value
 
 
-def row_to_lead_data(row):
+def row_to_lead_data(
+    row,
+):
     return {
-        "lead_key": row["lead_key"],
-        "row_hash": row["row_hash"],
+        "lead_key": row[
+            "lead_key"
+        ],
+
+        "row_hash": row[
+            "row_hash"
+        ],
 
         "lead_received_date": database_value(
-            row["lead_received_date"]
+            row[
+                "lead_received_date"
+            ]
         ),
 
         "customer_name": database_value(
-            row["customer_name"]
+            row[
+                "customer_name"
+            ]
         ),
 
         "customer_email": database_value(
-            row["customer_email"]
+            row[
+                "customer_email"
+            ]
         ),
 
         "customer_phone": database_value(
-            row["customer_phone"]
+            row[
+                "customer_phone"
+            ]
         ),
 
         "customer_phone_normalized": database_value(
-            row["customer_phone_normalized"]
+            row[
+                "customer_phone_normalized"
+            ]
         ),
 
         "customer_service": database_value(
-            row["customer_service"]
+            row[
+                "customer_service"
+            ]
         ),
 
         "customer_message": database_value(
-            row["customer_message"]
+            row[
+                "customer_message"
+            ]
         ),
 
         "customer_address": database_value(
-            row["customer_address"]
+            row[
+                "customer_address"
+            ]
         ),
 
         "status": database_value(
-            row["status"]
+            row[
+                "status"
+            ]
         ),
 
         "page_url": database_value(
-            row["page_url"]
+            row[
+                "page_url"
+            ]
         ),
 
         "page_name": database_value(
-            row["page_name"]
+            row[
+                "page_name"
+            ]
         ),
     }
 
-def sync_leads():
-    print("WEB 1: service started", flush=True)
 
-    valid_df = load_valid_leads()
+def sync_leads():
 
     print(
-        f"WEB 2: loader returned {len(valid_df)} rows",
+        "WEB 1: service started",
         flush=True,
     )
 
+
     stats = {
+        "fetched": 0,
         "inserted": 0,
         "updated": 0,
         "skipped": 0,
     }
 
-    if valid_df.empty:
-        return stats
-
-    print("WEB 3: opening DB session", flush=True)
 
     with SessionLocal() as db:
 
         try:
-            print("WEB 4: starting row sync", flush=True)
 
-            for index, (_, row) in enumerate(
-                valid_df.iterrows(),
-                start=1,
-            ):
-                lead_data = row_to_lead_data(row)
-
-                result = sync_lead(
+            # Web sheet:
+            # row 1 = metadata / other
+            # row 2 = headers
+            # row 3 onward = data
+            state = (
+                get_or_create_ingestion_state(
                     db,
-                    lead_data,
+                    source=WEB_SOURCE,
+                    initial_last_processed_row=2,
                 )
+            )
 
-                stats[result] += 1
 
-                if index % 100 == 0:
-                    print(
-                        f"WEB processed {index}",
-                        flush=True,
-                    )
+            start_row = (
+                state.last_processed_row
+                + 1
+            )
 
-            print("WEB 5: committing", flush=True)
 
-            db.commit()
-
-            print("WEB 6: commit complete", flush=True)
-
-        except Exception as exc:
             print(
-                f"WEB ERROR: {repr(exc)}",
+                "WEB checkpoint:",
+                state.last_processed_row,
                 flush=True,
             )
 
-            db.rollback()
-            raise
 
-    return stats
+            print(
+                "WEB starting row:",
+                start_row,
+                flush=True,
+            )
+
+
+            (
+                valid_df,
+                fetched_count,
+            ) = (
+                load_valid_leads(
+                    start_row
+                )
+            )
+
+
+            stats[
+                "fetched"
+            ] = fetched_count
+
+
+            # ---------------------------------
+            # No new rows
+            # ---------------------------------
+
+            if fetched_count == 0:
+
+                db.commit()
+
+                print(
+                    "WEB no new rows found",
+                    flush=True,
+                )
+
+                return stats
+
+
+            print(
+                f"WEB fetched "
+                f"{fetched_count} sheet rows",
+                flush=True,
+            )
+
+
+            print(
+                f"WEB valid rows: "
+                f"{len(valid_df)}",
+                flush=True,
+            )
+
+
+            # ---------------------------------
+            # Convert DataFrame rows
+            # into database-ready dictionaries
+            # ---------------------------------
+
+            leads_data = [
+                row_to_lead_data(
+                    row
+                )
+                for _, row
+                in valid_df.iterrows()
+            ]
+
+
+            # ---------------------------------
+            # Extract incoming lead keys
+            # ---------------------------------
+
+            lead_keys = [
+                item[
+                    "lead_key"
+                ]
+                for item
+                in leads_data
+            ]
+
+
+            print(
+                f"WEB checking "
+                f"{len(lead_keys)} lead keys",
+                flush=True,
+            )
+
+
+            # ---------------------------------
+            # Fetch matching existing rows
+            # in batches
+            # ---------------------------------
+
+            existing_map = (
+                get_existing_leads(
+                    db,
+                    lead_keys,
+                )
+            )
+
+
+            print(
+                f"WEB found "
+                f"{len(existing_map)} existing records",
+                flush=True,
+            )
+
+
+            # ---------------------------------
+            # Compare / sync in memory
+            # ---------------------------------
+
+            for lead_data in (
+                leads_data
+            ):
+
+                result = (
+                    sync_lead(
+                        db,
+                        lead_data,
+                        existing_map,
+                    )
+                )
+
+
+                stats[
+                    result
+                ] += 1
+
+
+            # ---------------------------------
+            # Advance checkpoint by number of
+            # actual Google Sheet rows fetched
+            # ---------------------------------
+
+            state.last_processed_row = (
+                state.last_processed_row
+                + fetched_count
+            )
+
+
+            print(
+                "WEB committing changes",
+                flush=True,
+            )
+
+
+            db.commit()
+
+
+            print(
+                "WEB committed. "
+                f"Checkpoint is now "
+                f"{state.last_processed_row}",
+                flush=True,
+            )
+
+
+            return stats
+
+
+        except Exception as exc:
+
+            db.rollback()
+
+
+            print(
+                f"WEB ERROR: "
+                f"{repr(exc)}",
+                flush=True,
+            )
+
+
+            raise

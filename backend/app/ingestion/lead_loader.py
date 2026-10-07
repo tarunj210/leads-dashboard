@@ -15,7 +15,7 @@ from app.integrations.google_sheets import (
 
 
 SPREADSHEET_ID = "19L7ZMFqButG0j7UW5HpYeVuwFCLX0B1_5FhtLyihhWI"
-RANGE_NAME = "Data!A:M"
+SHEET_NAME = "Data"
 
 
 REQUIRED_COLUMNS = {
@@ -33,6 +33,23 @@ REQUIRED_COLUMNS = {
     "Our Comments",
     "IP Address",
 }
+
+SHEET_COLUMNS = [
+    "Seq. No.",
+    "Lead Received Date",
+    "Customer Name",
+    "Customer Email",
+    "Customer Service",
+    "Customer Phone",
+    "Customer Address",
+    "Customer Message",
+    "Status (In Process / Booked / Not Booked)",
+    "Page Url",
+    "Page Name",
+    "Our Comments",
+    "IP Address",
+]
+
 
 
 COLUMN_MAPPING = {
@@ -89,53 +106,102 @@ ROW_HASH_FIELDS = [
 ]
 
 
-def fetch_sheet_values() -> list[list]:
+def fetch_sheet_values(
+    start_row: int,
+) -> list[list]:
 
-    print("FETCH 1: getting sheets service", flush=True)
+    print(
+        "FETCH 1: getting sheets service",
+        flush=True,
+    )
 
-    service = get_sheets_service()
 
-    print("FETCH 2: service ready", flush=True)
+    service = (
+        get_sheets_service()
+    )
+
+
+    range_name = (
+        f"{SHEET_NAME}!"
+        f"A{start_row}:M"
+    )
+
+
+    print(
+        f"WEB fetching range: "
+        f"{range_name}",
+        flush=True,
+    )
+
 
     result = (
-        service.spreadsheets()
+        service
+        .spreadsheets()
         .values()
         .get(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME,
-            valueRenderOption="UNFORMATTED_VALUE",
+            spreadsheetId=(
+                SPREADSHEET_ID
+            ),
+            range=range_name,
+            valueRenderOption=(
+                "UNFORMATTED_VALUE"
+            ),
         )
         .execute()
     )
 
-    print("FETCH 3: Google response received", flush=True)
 
-    return result.get("values", [])
+    print(
+        "FETCH 3: Google response received",
+        flush=True,
+    )
 
-def create_dataframe(values: list[list[str]]) -> pd.DataFrame:
+
+    return result.get(
+        "values",
+        [],
+    )
+
+def create_dataframe(
+    values: list[list],
+) -> pd.DataFrame:
+
     if not values:
-        return pd.DataFrame()
 
-    headers = values[1]
-    rows = values[2:]
+        return pd.DataFrame(
+            columns=SHEET_COLUMNS
+        )
 
-    column_count = len(headers)
+
+    column_count = len(
+        SHEET_COLUMNS
+    )
+
 
     normalized_rows = []
 
-    for row in rows:
+
+    for row in values:
+
         normalized_row = (
             row
-            + [""] * (column_count - len(row))
+            + [""] * (
+                column_count
+                - len(row)
+            )
         )
 
+
         normalized_rows.append(
-            normalized_row[:column_count]
+            normalized_row[
+                :column_count
+            ]
         )
+
 
     return pd.DataFrame(
         normalized_rows,
-        columns=headers,
+        columns=SHEET_COLUMNS,
     )
 
 def validate_schema(df: pd.DataFrame) -> None:
@@ -464,16 +530,20 @@ def add_hashes(
 
     return df
 
-def load_valid_leads() -> pd.DataFrame:
+def load_valid_leads(start_row: int,):
 
     print("LOADER 1: fetch start", flush=True)
 
-    values = fetch_sheet_values()
+    values = fetch_sheet_values(start_row)
 
     print("LOADER 2: fetch complete", flush=True)
 
     if not values:
-        return pd.DataFrame()
+
+        return (
+            pd.DataFrame(),
+            0,
+        )
 
     print("LOADER 3: create dataframe", flush=True)
 
@@ -521,4 +591,7 @@ def load_valid_leads() -> pd.DataFrame:
 
     print("LOADER 14: done", flush=True)
 
-    return valid_df
+    return (
+    valid_df,
+    len(values),
+    )

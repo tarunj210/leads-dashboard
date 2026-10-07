@@ -3,7 +3,7 @@ import "./AppHeader.css";
 
 export type DashboardTab =
     | "overview"
-    | "web"
+    | "Email"
     | "mobile"
     | "marketing";
 
@@ -51,7 +51,7 @@ export default function AppHeader({
                     <div className="app-header-brand-text">
 
                         <div className="app-header-title">
-                            Lead Tracker
+                            FreshA Tracker
                         </div>
 
                     </div>
@@ -83,17 +83,17 @@ export default function AppHeader({
                     <button
                         type="button"
                         className={
-                            activeTab === "web"
+                            activeTab === "Email"
                                 ? "app-nav-item active"
                                 : "app-nav-item"
                         }
                         onClick={() =>
                             onTabChange(
-                                "web"
+                                "Email"
                             )
                         }
                     >
-                        Web leads
+                        Email leads
 
                         {
                             webLeadCount !== undefined &&

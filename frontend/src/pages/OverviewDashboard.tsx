@@ -247,7 +247,7 @@ export default function OverviewDashboard({
 
                         <span>
 
-                            Web{" "}
+                            Email{" "}
 
                             <strong>
                                 {summary.web_leads}
@@ -276,7 +276,7 @@ export default function OverviewDashboard({
                 <section className="overview-kpi-card">
 
                     <div className="overview-kpi-title">
-                        Web booked
+                        Email booked
                     </div>
 
 
@@ -297,7 +297,7 @@ export default function OverviewDashboard({
                 <section className="overview-kpi-card">
 
                     <div className="overview-kpi-title">
-                        Web conversion rate
+                        Email conversion rate
                     </div>
 
 
@@ -347,11 +347,11 @@ export default function OverviewDashboard({
                         <div>
 
                             <h2>
-                                Web performance
+                                Email performance
                             </h2>
 
                             <p>
-                                Website lead performance
+                                Email lead performance
                             </p>
 
                         </div>
@@ -364,7 +364,7 @@ export default function OverviewDashboard({
                         <div className="overview-mini-card">
 
                             <span>
-                                Web leads
+                                Email leads
                             </span>
 
                             <strong>
@@ -494,7 +494,7 @@ export default function OverviewDashboard({
                 <div className="overview-channel-row">
 
                     <span className="overview-channel-name">
-                        Web
+                        Email
                     </span>
 
 

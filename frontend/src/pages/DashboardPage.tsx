@@ -838,10 +838,6 @@ export default function DashboardPage({
                     dateBounds.max_date
                 }
 
-                availableDates={
-                    availableDates
-                }
-
                 service={
                     service
                 }

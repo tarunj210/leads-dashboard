@@ -1,5 +1,4 @@
 import {
-    useMemo,
     useState,
 } from "react";
 
@@ -18,7 +17,6 @@ interface DashboardFiltersProps {
     minDate: string | null;
     maxDate: string | null;
 
-    availableDates: string[];
 
     service: string;
     domain: string;
@@ -205,8 +203,6 @@ export default function DashboardFilters({
     minDate,
     maxDate,
 
-    availableDates,
-
     service,
     domain,
     pageName,
@@ -266,24 +262,31 @@ export default function DashboardFilters({
        Available dates
     ===================================== */
 
-    const availableDateSet =
-        useMemo(
-            () =>
-                new Set(
-                    availableDates.map(
-                        normalizeDateString
-                    )
-                ),
-            [availableDates]
-        );
-
-
     function isDateDisabled(
         date: Date
     ): boolean {
-        return !availableDateSet.has(
-            formatDate(date)
-        );
+    
+        if (
+            minDate &&
+            date < parseDate(
+                minDate
+            )
+        ) {
+            return true;
+        }
+    
+    
+        if (
+            maxDate &&
+            date > parseDate(
+                maxDate
+            )
+        ) {
+            return true;
+        }
+    
+    
+        return false;
     }
 
 

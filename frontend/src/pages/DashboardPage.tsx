@@ -536,7 +536,8 @@ export default function DashboardPage({
     // =========================================
 
     async function loadLeadTable(
-        page: number
+        page: number,
+        append = false,
     ) {
 
         try {
@@ -574,7 +575,59 @@ export default function DashboardPage({
 
 
             setLeadData(
-                data
+                (
+                    current
+                ) => {
+
+                    /*
+                     * First page or filter change:
+                     * replace existing rows.
+                     */
+                    if (
+                        !append ||
+                        !current
+                    ) {
+
+                        return data;
+                    }
+
+
+                    /*
+                     * Load more:
+                     * append only new rows.
+                     */
+                    const existingIds =
+                        new Set(
+                            current.items.map(
+                                (lead) =>
+                                    lead.id
+                            )
+                        );
+
+
+                    const newItems =
+                        data.items.filter(
+                            (lead) =>
+                                !existingIds.has(
+                                    lead.id
+                                )
+                        );
+
+
+                    return {
+                        ...data,
+
+                        items: [
+                            ...current.items,
+                            ...newItems,
+                        ],
+                    };
+                }
+            );
+
+
+            setTablePage(
+                page
             );
 
         } catch (err) {
@@ -589,6 +642,7 @@ export default function DashboardPage({
             setTableLoading(
                 false
             );
+
         }
     }
 
@@ -608,7 +662,8 @@ export default function DashboardPage({
 
 
         loadLeadTable(
-            1
+            1,
+            false
         );
 
     }, [
@@ -619,7 +674,6 @@ export default function DashboardPage({
         pageName,
         status,
     ]);
-
 
     // =========================================
     // Header refresh
@@ -637,8 +691,14 @@ export default function DashboardPage({
         loadDashboardData();
 
 
+        setTablePage(
+            1
+        );
+
+
         loadLeadTable(
-            tablePage
+            1,
+            false
         );
 
     }, [
@@ -650,22 +710,7 @@ export default function DashboardPage({
     // Table pagination
     // =========================================
 
-    useEffect(() => {
 
-        if (
-            tablePage === 1
-        ) {
-            return;
-        }
-
-
-        loadLeadTable(
-            tablePage
-        );
-
-    }, [
-        tablePage,
-    ]);
 
 
     // =========================================
@@ -1244,6 +1289,7 @@ export default function DashboardPage({
 
 
                 <LeadTable
+
                     data={
                         leadData
                     }
@@ -1252,9 +1298,33 @@ export default function DashboardPage({
                         tableLoading
                     }
 
-                    onPageChange={
-                        setTablePage
-                    }
+                    onLoadMore={() => {
+
+                        if (
+                            !leadData ||
+                            tableLoading
+                        ) {
+
+                            return;
+                        }
+
+
+                        if (
+                            tablePage >=
+                            leadData.total_pages
+                        ) {
+
+                            return;
+                        }
+
+
+                        loadLeadTable(
+                            tablePage + 1,
+                            true
+                        );
+
+                    }}
+
                 />
 
             </section>

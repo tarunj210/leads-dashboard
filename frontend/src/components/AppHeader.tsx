@@ -5,7 +5,8 @@ export type DashboardTab =
     | "overview"
     | "web"
     | "mobile"
-    | "marketing";
+    | "marketing"
+    | "message";
 
 
 type AppHeaderProps = {
@@ -157,6 +158,23 @@ export default function AppHeader({
                         }
                     >
                         Marketing Calls
+                    </button>
+
+
+                    <button
+                        type="button"
+                        className={
+                            activeTab === "message"
+                                ? "app-nav-item active"
+                                : "app-nav-item"
+                        }
+                        onClick={() =>
+                            onTabChange(
+                                "message"
+                            )
+                        }
+                    >
+                        Message
                     </button>
 
 

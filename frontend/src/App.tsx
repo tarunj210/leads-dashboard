@@ -20,6 +20,9 @@ import MarketingDashboard
 
 import "./App.css";
 
+import MessageDashboard
+    from "./components/MessageDashboard";
+
 const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL;
 
@@ -107,6 +110,43 @@ export default function App() {
                     );
                 }
             }
+
+            if (activeTab === "message") {
+
+                const [
+                    webResponse,
+                    mobileResponse,
+                ] = await Promise.all([
+
+                    fetch(
+                        `${API_BASE_URL}/api/ingestion/refresh`,
+                        {
+                            method: "POST",
+                        }
+                    ),
+
+                    fetch(
+                        `${API_BASE_URL}/api/mobile-ingestion/refresh`,
+                        {
+                            method: "POST",
+                        }
+                    ),
+
+                ]);
+
+
+                if (
+                    !webResponse.ok ||
+                    !mobileResponse.ok
+                ) {
+
+                    throw new Error(
+                        "Failed to refresh message leads"
+                    );
+                }
+            }
+
+
 
 
             if (activeTab === "overview") {
@@ -225,6 +265,16 @@ export default function App() {
                     activeTab === "marketing" &&
                     (
                         <MarketingDashboard
+                            refreshKey={
+                                refreshKey
+                            }
+                        />
+                    )
+                }
+                {
+                    activeTab === "message" &&
+                    (
+                        <MessageDashboard
                             refreshKey={
                                 refreshKey
                             }

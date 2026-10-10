@@ -1,188 +1,366 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL;
+    import.meta.env.VITE_API_BASE_URL;
+
 
 if (!API_BASE_URL) {
-  throw new Error(
-    "VITE_API_BASE_URL is not defined"
-  );
+
+    throw new Error(
+        "VITE_API_BASE_URL is not defined"
+    );
 }
+
+
+/* =========================================
+   Filter options
+========================================= */
 
 export type MobileFilterOptions = {
-  date_range: {
-    min_date: string | null;
-    max_date: string | null;
-  };
 
-  duration: {
-    default: number;
-    operator: string;
-  };
+    date_range: {
+        min_date: string | null;
+        max_date: string | null;
+    };
+
+    duration: {
+        default_min: number;
+        default_max: number | null;
+    };
 };
 
+
+/* =========================================
+   Summary
+========================================= */
 
 export type MobileSummary = {
-  start_date: string | null;
-  end_date: string | null;
 
-  min_duration: number;
+    start_date: string | null;
+    end_date: string | null;
 
-  most_common_cld: string | null;
-  most_common_cld_count: number;
+    min_duration: number;
+    max_duration: number | null;
 
-  total_calls: number;
-  unique_cli: number;
+    view_mode:
+        | "forwarded"
+        | "website";
 
-  total_duration_seconds: number;
-  total_duration_minutes: number;
+    active_cld: string | null;
 
-  total_cost: number;
+    most_common_cld: string | null;
+    most_common_cld_count: number;
+
+    total_calls: number;
+    unique_cli: number;
+
+    total_duration_seconds: number;
+    total_duration_minutes: number;
+
+    total_cost: number;
 };
 
+
+/* =========================================
+   Mobile call
+========================================= */
 
 export type MobileCall = {
-  id: number;
 
-  connect_time: string;
+    id: number;
 
-  cli: string | null;
-  cld: string | null;
+    connect_time: string;
 
-  prefix: string | null;
+    cli: string | null;
+    cld: string | null;
 
-  billed_duration: number | null;
-  result: number | null;
-  cost: number | null;
+    prefix: string | null;
 
-  remote_ip: string | null;
-  access_list: string | null;
+    billed_duration: number | null;
+    result: number | null;
+    cost: number | null;
+
+    remote_ip: string | null;
+    access_list: string | null;
 };
 
+
+/* =========================================
+   Calls response
+========================================= */
 
 export type MobileCallsResponse = {
-  page: number;
-  page_size: number;
-  total: number;
-  total_pages: number;
 
-  items: MobileCall[];
+    page: number;
+
+    page_size: number;
+
+    total: number;
+
+    total_pages: number;
+
+    items: MobileCall[];
 };
 
+
+/* =========================================
+   Request filters
+========================================= */
 
 export type MobileDashboardFilters = {
-  startDate?: string;
-  endDate?: string;
 
-  minDuration?: number;
+    startDate?: string;
+    endDate?: string;
 
-  page?: number;
-  pageSize?: number;
+    minDuration?: number;
+
+    maxDuration?: number | null;
+
+    viewMode?:
+        | "forwarded"
+        | "website";
+
+    selectedCld?:
+        string | null;
+
+    page?: number;
+
+    pageSize?: number;
 };
 
 
+/* =========================================
+   Query builder
+========================================= */
+
 function buildQuery(
-  filters: MobileDashboardFilters,
+    filters: MobileDashboardFilters,
 ) {
-  const params = new URLSearchParams();
 
-  if (filters.startDate) {
-    params.set(
-      "start_date",
-      filters.startDate,
+    const params =
+        new URLSearchParams();
+
+
+    if (
+        filters.startDate
+    ) {
+
+        params.set(
+            "start_date",
+            filters.startDate
+        );
+    }
+
+
+    if (
+        filters.endDate
+    ) {
+
+        params.set(
+            "end_date",
+            filters.endDate
+        );
+    }
+
+
+    if (
+        filters.minDuration
+        !== undefined
+    ) {
+
+        params.set(
+            "min_duration",
+            filters
+                .minDuration
+                .toString()
+        );
+    }
+
+
+    if (
+        filters.maxDuration
+        !== undefined &&
+        filters.maxDuration
+        !== null
+    ) {
+
+        params.set(
+            "max_duration",
+            filters
+                .maxDuration
+                .toString()
+        );
+    }
+
+
+    if (
+        filters.viewMode
+    ) {
+
+        params.set(
+            "view_mode",
+            filters.viewMode
+        );
+    }
+
+
+    if (
+        filters.selectedCld
+    ) {
+
+        params.set(
+            "selected_cld",
+            filters.selectedCld
+        );
+    }
+
+
+    if (
+        filters.page
+        !== undefined
+    ) {
+
+        params.set(
+            "page",
+            filters
+                .page
+                .toString()
+        );
+    }
+
+
+    if (
+        filters.pageSize
+        !== undefined
+    ) {
+
+        params.set(
+            "page_size",
+            filters
+                .pageSize
+                .toString()
+        );
+    }
+
+
+    return (
+        params.toString()
     );
-  }
-
-  if (filters.endDate) {
-    params.set(
-      "end_date",
-      filters.endDate,
-    );
-  }
-
-  if (
-    filters.minDuration !== undefined
-  ) {
-    params.set(
-      "min_duration",
-      filters.minDuration.toString(),
-    );
-  }
-
-  if (filters.page !== undefined) {
-    params.set(
-      "page",
-      filters.page.toString(),
-    );
-  }
-
-  if (
-    filters.pageSize !== undefined
-  ) {
-    params.set(
-      "page_size",
-      filters.pageSize.toString(),
-    );
-  }
-
-  return params.toString();
 }
 
+
+/* =========================================
+   Filter options
+========================================= */
 
 export async function fetchMobileFilterOptions():
-  Promise<MobileFilterOptions> {
+    Promise<MobileFilterOptions> {
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/mobile-dashboard/filter-options`,
-  );
+    const response =
+        await fetch(
+            `${API_BASE_URL}/api/mobile-dashboard/filter-options`
+        );
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to load mobile filter options",
+
+    if (
+        !response.ok
+    ) {
+
+        throw new Error(
+            "Failed to load mobile filter options"
+        );
+    }
+
+
+    return (
+        response.json()
     );
-  }
-
-  return response.json();
 }
 
+
+/* =========================================
+   Summary
+========================================= */
 
 export async function fetchMobileSummary(
-  filters: MobileDashboardFilters,
+    filters: MobileDashboardFilters,
 ): Promise<MobileSummary> {
 
-  const query = buildQuery({
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-    minDuration: filters.minDuration,
-  });
+    const query =
+        buildQuery({
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/mobile-dashboard/summary?${query}`,
-  );
+            startDate:
+                filters.startDate,
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to load mobile dashboard summary",
+            endDate:
+                filters.endDate,
+
+            minDuration:
+                filters.minDuration,
+
+            maxDuration:
+                filters.maxDuration,
+
+            viewMode:
+                filters.viewMode,
+
+            selectedCld:
+                filters.selectedCld,
+
+        });
+
+
+    const response =
+        await fetch(
+            `${API_BASE_URL}/api/mobile-dashboard/summary?${query}`
+        );
+
+
+    if (
+        !response.ok
+    ) {
+
+        throw new Error(
+            "Failed to load mobile dashboard summary"
+        );
+    }
+
+
+    return (
+        response.json()
     );
-  }
-
-  return response.json();
 }
 
 
+/* =========================================
+   Calls
+========================================= */
+
 export async function fetchMobileCalls(
-  filters: MobileDashboardFilters,
+    filters: MobileDashboardFilters,
 ): Promise<MobileCallsResponse> {
 
-  const query = buildQuery(filters);
+    const query =
+        buildQuery(
+            filters
+        );
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/mobile-dashboard/calls?${query}`,
-  );
 
-  if (!response.ok) {
-    throw new Error(
-      "Failed to load mobile calls",
+    const response =
+        await fetch(
+            `${API_BASE_URL}/api/mobile-dashboard/calls?${query}`
+        );
+
+
+    if (
+        !response.ok
+    ) {
+
+        throw new Error(
+            "Failed to load mobile calls"
+        );
+    }
+
+
+    return (
+        response.json()
     );
-  }
-
-  return response.json();
 }

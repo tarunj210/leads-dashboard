@@ -21,6 +21,14 @@ export type MobileFilters = {
     endDate: string;
 
     minDuration: number;
+    maxDuration: number | null;
+
+    viewMode:
+        | "forwarded"
+        | "website";
+
+    selectedCld:
+        string | null;
 };
 
 

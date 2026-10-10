@@ -109,6 +109,34 @@ function saveStoredValue<T>(
     }
 }
 
+function loadMobileFilters():
+    MobileFilters {
+
+    const defaults: MobileFilters = {
+        startDate: "",
+        endDate: "",
+        minDuration: 60,
+        maxDuration: null,
+        viewMode: "forwarded",
+        selectedCld: null,
+    };
+
+
+    const stored =
+        loadStoredValue<
+            Partial<MobileFilters>
+        >(
+            STORAGE_KEYS.mobile,
+            {}
+        );
+
+
+    return {
+        ...defaults,
+        ...stored,
+    };
+}
+
 
 export default function App() {
 
@@ -168,19 +196,12 @@ export default function App() {
        Persistent Mobile filters
     ========================================= */
 
+    
     const [
         mobileFilters,
         setMobileFilters,
     ] = useState<MobileFilters>(
-        () =>
-            loadStoredValue<MobileFilters>(
-                STORAGE_KEYS.mobile,
-                {
-                    startDate: "",
-                    endDate: "",
-                    minDuration: 60,
-                }
-            )
+        loadMobileFilters
     );
 
 

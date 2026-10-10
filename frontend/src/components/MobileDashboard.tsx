@@ -65,6 +65,9 @@ export default function MobileDashboard({
         startDate,
         endDate,
         minDuration,
+        maxDuration,
+        viewMode,
+        selectedCld,
     } = filters;
 
 
@@ -221,6 +224,12 @@ export default function MobileDashboard({
 
                     minDuration,
 
+                    maxDuration,
+
+                    viewMode,
+
+                    selectedCld,
+
                 });
 
 
@@ -284,6 +293,12 @@ export default function MobileDashboard({
                         undefined,
 
                     minDuration,
+
+                    maxDuration,
+
+                    viewMode,
+
+                    selectedCld,
 
                     page:
                         currentPage,
@@ -542,6 +557,12 @@ export default function MobileDashboard({
 
                     minDuration,
 
+                    maxDuration,
+
+                    viewMode,
+
+                    selectedCld,
+
                 });
 
 
@@ -594,28 +615,40 @@ export default function MobileDashboard({
     function clearFilters() {
 
         onFiltersChange({
-    
+
             startDate:
                 filterOptions
                     ?.date_range
                     .min_date
                 ?? "",
-    
+
             endDate:
                 filterOptions
                     ?.date_range
                     .max_date
                 ?? "",
-    
+
             minDuration:
                 filterOptions
                     ?.duration
-                    .default
+                    .default_min
                 ?? 60,
-    
+
+            maxDuration:
+                filterOptions
+                    ?.duration
+                    .default_max
+                ?? null,
+
+            viewMode:
+                "forwarded",
+
+            selectedCld:
+                null,
+
         });
-    
-    
+
+
         setPage(
             1
         );
@@ -927,31 +960,42 @@ export default function MobileDashboard({
 
     useEffect(
         () => {
-    
+
             if (!filterOptions) {
                 return;
             }
-    
-    
+
+
+            if (
+                viewMode === "website" &&
+                !selectedCld
+            ) {
+                return;
+            }
+
+
             loadSummary();
-    
-    
+
+
             setPage(
                 1
             );
-    
-    
+
+
             loadCalls(
                 1,
                 false
             );
-    
+
         },
         [
             filterOptions,
             startDate,
             endDate,
             minDuration,
+            maxDuration,
+            viewMode,
+            selectedCld,
         ]
     );
 

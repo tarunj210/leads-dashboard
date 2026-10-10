@@ -927,31 +927,28 @@ export default function MobileDashboard({
 
     useEffect(
         () => {
-
+    
             if (!filterOptions) {
                 return;
             }
-
-
+    
+    
             loadSummary();
-
-
-            /*
-             * Filter changes always reset
-             * cumulative pagination.
-             */
+    
+    
             setPage(
                 1
             );
-
-
+    
+    
             loadCalls(
                 1,
                 false
             );
-
+    
         },
         [
+            filterOptions,
             startDate,
             endDate,
             minDuration,

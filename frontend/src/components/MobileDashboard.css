@@ -2,6 +2,198 @@
    Mobile Dashboard Page
 ========================================= */
 
+/* =========================================
+   Mobile Sub-tabs
+========================================= */
+
+.mobile-subtabs {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-bottom: 18px;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+
+.mobile-subtab {
+    appearance: none;
+
+    position: relative;
+
+    padding:
+        11px
+        16px;
+
+    border: none;
+
+    border-bottom:
+        3px solid transparent;
+
+    background: transparent;
+
+    color: #667085;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+
+.mobile-subtab:hover {
+    color: #101828;
+
+    background: #f9fafb;
+}
+
+
+.mobile-subtab.active {
+    color: #101828;
+
+    border-bottom-color:
+        #315ecd;
+
+    background: #f8fafc;
+}
+
+
+/* =========================================
+   Website Selector
+========================================= */
+
+.mobile-website-selector-card {
+    margin-bottom: 16px;
+
+    padding: 18px;
+
+    background: #ffffff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px
+        rgba(16, 24, 40, 0.04);
+}
+
+
+.mobile-tracking-number-filter {
+    max-width: 720px;
+}
+
+
+.mobile-tracking-number-filter
+.mobile-filter-input {
+    width: 100%;
+}
+
+
+/* =========================================
+   Website Empty State
+========================================= */
+
+.mobile-view-empty-state {
+    margin-top: 18px;
+
+    padding:
+        34px
+        20px;
+
+    border:
+        1px dashed #d0d5dd;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    text-align: center;
+}
+
+
+.mobile-view-empty-state h3 {
+    margin:
+        0
+        0
+        6px;
+
+    color: #101828;
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+
+.mobile-view-empty-state p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   Table Subtitle
+========================================= */
+
+.mobile-table-subtitle {
+    margin:
+        4px
+        0
+        0;
+
+    color: #98a2b3;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   Responsive Sub-tabs
+========================================= */
+
+@media (
+    max-width: 760px
+) {
+
+    .mobile-subtabs {
+        align-items: stretch;
+    }
+
+
+    .mobile-subtab {
+        flex: 1;
+
+        padding:
+            10px
+            8px;
+
+        text-align: center;
+    }
+
+
+    .mobile-website-selector-card {
+        padding: 14px;
+    }
+
+}
+
 .mobile-dashboard-page {
     width: 100%;
     max-width: 1500px;

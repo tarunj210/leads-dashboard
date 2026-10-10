@@ -3,6 +3,10 @@ import {
     useState,
 } from "react";
 
+import type {
+    MessageFilters,
+} from "../types/filters";
+
 import {
     fetchLeadMessage,
     type LeadMessageResponse,
@@ -11,11 +15,17 @@ import {
 import "./MessageDashboard.css";
 
 
+
 type MessageDashboardProps = {
 
     refreshKey: number;
-};
 
+    filters: MessageFilters;
+
+    onFiltersChange: (
+        filters: MessageFilters
+    ) => void;
+};
 
 function pad(
     value: number,
@@ -109,28 +119,41 @@ function getDefaultRange() {
 export default function MessageDashboard({
 
     refreshKey,
+    filters,
+    onFiltersChange,
 
 }: MessageDashboardProps) {
 
     const defaultRange =
         getDefaultRange();
 
+    useEffect(
+        () => {
+        
+            if (
+                !filters.startDate ||
+                !filters.endDate
+            ) {
+        
+                onFiltersChange({
+        
+                    startDate:
+                        filters.startDate ||
+                        defaultRange.start,
+        
+                    endDate:
+                        filters.endDate ||
+                        defaultRange.end,
+        
+                });
+        
+            }
+    
+        },
+            []
+        );
 
-    const [
-        startDate,
-        setStartDate,
-    ] = useState(
-        defaultRange.start
-    );
-
-
-    const [
-        endDate,
-        setEndDate,
-    ] = useState(
-        defaultRange.end
-    );
-
+    const {startDate,endDate,} = filters;
 
     const [
         data,
@@ -320,15 +343,25 @@ export default function MessageDashboard({
 
                     <input
                         type="datetime-local"
+
                         value={
                             startDate
                         }
-                        onChange={
-                            (event) =>
-                                setStartDate(
-                                    event.target.value
-                                )
-                        }
+
+                        onChange={(
+                            event
+                        ) => {
+
+                            onFiltersChange({
+
+                                ...filters,
+
+                                startDate:
+                                    event.target.value,
+
+                            });
+
+                        }}
                     />
 
                 </div>
@@ -342,15 +375,25 @@ export default function MessageDashboard({
 
                     <input
                         type="datetime-local"
+
                         value={
                             endDate
                         }
-                        onChange={
-                            (event) =>
-                                setEndDate(
-                                    event.target.value
-                                )
-                        }
+
+                        onChange={(
+                            event
+                        ) => {
+
+                            onFiltersChange({
+
+                                ...filters,
+
+                                endDate:
+                                    event.target.value,
+
+                            });
+
+                        }}
                     />
 
                 </div>

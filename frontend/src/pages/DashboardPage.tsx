@@ -3,6 +3,10 @@ import {
     useState,
 } from "react";
 
+import type {
+    WebFilters,
+} from "../types/filters";
+
 import {
     getDashboardData,
 } from "../api/dashboard";
@@ -37,12 +41,23 @@ import type {
 
 
 type DashboardPageProps = {
+
     refreshKey: number;
+
+    filters: WebFilters;
+
+    onFiltersChange: (
+        filters: WebFilters
+    ) => void;
 };
 
 
 export default function DashboardPage({
+
     refreshKey,
+    filters,
+    onFiltersChange,
+
 }: DashboardPageProps) {
 
 
@@ -99,40 +114,14 @@ export default function DashboardPage({
     // Selected filters
     // =========================================
 
-    const [
+    const {
         startDate,
-        setStartDate,
-    ] = useState("");
-
-
-    const [
         endDate,
-        setEndDate,
-    ] = useState("");
-
-
-    const [
         service,
-        setService,
-    ] = useState("all");
-
-
-    const [
         domain,
-        setDomain,
-    ] = useState("all");
-
-
-    const [
         pageName,
-        setPageName,
-    ] = useState("all");
-
-
-    const [
         status,
-        setStatus,
-    ] = useState("all");
+    } = filters;
 
 
     // =========================================
@@ -199,36 +188,31 @@ export default function DashboardPage({
 
     function clearFilters() {
 
-        setStartDate(
-            dateBounds.min_date ?? ""
-        );
-
-
-        setEndDate(
-            dateBounds.max_date ?? ""
-        );
-
-
-        setService(
-            "all"
-        );
-
-
-        setDomain(
-            "all"
-        );
-
-
-        setPageName(
-            "all"
-        );
-
-
-        setStatus(
-            "all"
-        );
-
-
+        onFiltersChange({
+    
+            startDate:
+                dateBounds.min_date
+                ?? "",
+    
+            endDate:
+                dateBounds.max_date
+                ?? "",
+    
+            service:
+                "all",
+    
+            domain:
+                "all",
+    
+            pageName:
+                "all",
+    
+            status:
+                "all",
+    
+        });
+    
+    
         setTablePage(
             1
         );
@@ -422,24 +406,25 @@ export default function DashboardPage({
             // =================================
 
             if (
-                !startDate &&
-                data.date_bounds.min_date
+                !filters.startDate ||
+                !filters.endDate
             ) {
-
-                setStartDate(
-                    data.date_bounds.min_date
-                );
-            }
-
-
-            if (
-                !endDate &&
-                data.date_bounds.max_date
-            ) {
-
-                setEndDate(
-                    data.date_bounds.max_date
-                );
+            
+                onFiltersChange({
+            
+                    ...filters,
+            
+                    startDate:
+                        filters.startDate ||
+                        data.date_bounds.min_date ||
+                        "",
+            
+                    endDate:
+                        filters.endDate ||
+                        data.date_bounds.max_date ||
+                        "",
+            
+                });
             }
 
 
@@ -447,54 +432,81 @@ export default function DashboardPage({
             // Faceted-filter safety
             // =================================
 
+            const nextFilters = {
+                ...filters,
+            };
+            
+            
+            let filtersChanged =
+                false;
+            
+            
             if (
                 service !== "all" &&
                 !data.filter_options.services.includes(
                     service
                 )
             ) {
-
-                setService(
-                    "all"
-                );
+            
+                nextFilters.service =
+                    "all";
+            
+                filtersChanged =
+                    true;
             }
-
-
+            
+            
             if (
                 domain !== "all" &&
                 !data.filter_options.domains.includes(
                     domain
                 )
             ) {
-
-                setDomain(
-                    "all"
-                );
+            
+                nextFilters.domain =
+                    "all";
+            
+                filtersChanged =
+                    true;
             }
-
-
+            
+            
             if (
                 pageName !== "all" &&
                 !data.filter_options.page_names.includes(
                     pageName
                 )
             ) {
-
-                setPageName(
-                    "all"
-                );
+            
+                nextFilters.pageName =
+                    "all";
+            
+                filtersChanged =
+                    true;
             }
-
-
+            
+            
             if (
                 status !== "all" &&
                 !data.filter_options.statuses.includes(
                     status
                 )
             ) {
-
-                setStatus(
-                    "all"
+            
+                nextFilters.status =
+                    "all";
+            
+                filtersChanged =
+                    true;
+            }
+            
+            
+            if (
+                filtersChanged
+            ) {
+            
+                onFiltersChange(
+                    nextFilters
                 );
             }
 
@@ -860,29 +872,95 @@ export default function DashboardPage({
                     filterOptions.statuses
                 }
 
-                onStartDateChange={
-                    setStartDate
-                }
+                onStartDateChange={(
+                    value
+                ) => {
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        startDate:
+                            value,
+                
+                    });
+                
+                }}
 
-                onEndDateChange={
-                    setEndDate
-                }
+                onEndDateChange={(
+                    value
+                ) => {
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        endDate:
+                            value,
+                
+                    });
+                
+                }}
 
-                onServiceChange={
-                    setService
-                }
+                onServiceChange={(
+                    value
+                ) => {
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        service:
+                            value,
+                
+                    });
+                
+                }}
 
-                onDomainChange={
-                    setDomain
-                }
+                onDomainChange={(
+                    value
+                ) => {
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        domain:
+                            value,
+                
+                    });
+                
+                }}
 
-                onPageNameChange={
-                    setPageName
-                }
+                onPageNameChange={(
+                    value
+                ) => {
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        pageName:
+                            value,
+                
+                    });
+                
+                }}
 
-                onStatusChange={
-                    setStatus
-                }
+                onStatusChange={(
+                    value
+                ) => {
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        status:
+                            value,
+                
+                    });
+                
+                }}
 
                 onClearFilters={
                     clearFilters

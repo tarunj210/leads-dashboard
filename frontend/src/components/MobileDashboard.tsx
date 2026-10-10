@@ -3,6 +3,10 @@ import {
     useState,
 } from "react";
 
+import type {
+    MobileFilters,
+} from "../types/filters";
+
 import {
     fetchMobileCalls,
     fetchMobileFilterOptions,
@@ -22,12 +26,22 @@ import "./MobileDashboard.css";
 
 
 type MobileDashboardProps = {
+
     refreshKey: number;
+
+    filters: MobileFilters;
+
+    onFiltersChange: (
+        filters: MobileFilters
+    ) => void;
 };
 
-
 export default function MobileDashboard({
+
     refreshKey,
+    filters,
+    onFiltersChange,
+
 }: MobileDashboardProps) {
 
 
@@ -47,22 +61,11 @@ export default function MobileDashboard({
        Selected filters
     ========================================= */
 
-    const [
+    const {
         startDate,
-        setStartDate,
-    ] = useState("");
-
-
-    const [
         endDate,
-        setEndDate,
-    ] = useState("");
-
-
-    const [
         minDuration,
-        setMinDuration,
-    ] = useState(60);
+    } = filters;
 
 
     /* =========================================
@@ -138,59 +141,46 @@ export default function MobileDashboard({
     async function loadFilterOptions() {
 
         try {
-
+    
             const options =
                 await fetchMobileFilterOptions();
-
-
+    
+    
             setFilterOptions(
                 options
             );
-
-
+    
+    
             if (
-                !startDate &&
-                options.date_range.min_date
+                !filters.startDate ||
+                !filters.endDate
             ) {
-
-                setStartDate(
-                    options
-                        .date_range
-                        .min_date
-                );
+    
+                onFiltersChange({
+    
+                    ...filters,
+    
+                    startDate:
+                        filters.startDate ||
+                        options.date_range.min_date ||
+                        "",
+    
+                    endDate:
+                        filters.endDate ||
+                        options.date_range.max_date ||
+                        "",
+    
+                });
             }
-
-
-            if (
-                !endDate &&
-                options.date_range.max_date
-            ) {
-
-                setEndDate(
-                    options
-                        .date_range
-                        .max_date
-                );
-            }
-
-
-            if (!filterOptions) {
-
-                setMinDuration(
-                    options
-                        .duration
-                        .default
-                );
-            }
-
+    
         } catch (err) {
-
+    
             console.error(
                 "Failed to load mobile filter options:",
                 err
             );
-
-
+    
+    
             setError(
                 err instanceof Error
                     ? err.message
@@ -603,30 +593,29 @@ export default function MobileDashboard({
 
     function clearFilters() {
 
-        setStartDate(
-            filterOptions
-                ?.date_range
-                .min_date
-            ?? ""
-        );
-
-
-        setEndDate(
-            filterOptions
-                ?.date_range
-                .max_date
-            ?? ""
-        );
-
-
-        setMinDuration(
-            filterOptions
-                ?.duration
-                .default
-            ?? 60
-        );
-
-
+        onFiltersChange({
+    
+            startDate:
+                filterOptions
+                    ?.date_range
+                    .min_date
+                ?? "",
+    
+            endDate:
+                filterOptions
+                    ?.date_range
+                    .max_date
+                ?? "",
+    
+            minDuration:
+                filterOptions
+                    ?.duration
+                    .default
+                ?? 60,
+    
+        });
+    
+    
         setPage(
             1
         );
@@ -1110,31 +1099,46 @@ export default function MobileDashboard({
                 onStartDateChange={(
                     value
                 ) => {
-
-                    setStartDate(
-                        value
-                    );
-
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        startDate:
+                            value,
+                
+                    });
+                
                 }}
 
                 onEndDateChange={(
                     value
                 ) => {
-
-                    setEndDate(
-                        value
-                    );
-
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        endDate:
+                            value,
+                
+                    });
+                
                 }}
 
                 onMinDurationChange={(
                     value
                 ) => {
-
-                    setMinDuration(
-                        value
-                    );
-
+                
+                    onFiltersChange({
+                
+                        ...filters,
+                
+                        minDuration:
+                            value,
+                
+                    });
+                
                 }}
 
                 onClearFilters={

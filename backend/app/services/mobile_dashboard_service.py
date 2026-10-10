@@ -27,13 +27,7 @@ def get_mobile_summary(
         most_common_cld = None
 
         if view_mode == "forwarded":
-            most_common_cld = get_most_common_cld(
-                db,
-                min_duration=min_duration,
-                max_duration=max_duration,
-                start_date=start_date,
-                end_date=end_date,
-            )
+            most_common_cld = most_common_cld = get_most_common_cld(db)
 
 
         rows = get_filtered_mobile_calls(

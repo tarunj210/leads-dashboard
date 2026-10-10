@@ -151,38 +151,23 @@ def apply_mobile_filters(
 
 def get_most_common_cld(
     db,
-    *,
-    min_duration: int = 60,
-    max_duration: int | None = None,
-    start_date: datetime | None = None,
-    end_date: datetime | None = None,
 ):
 
     query = db.query(
-
         MobileLead.cld,
-
         func.count(
             MobileLead.id
         ).label(
             "count"
         ),
-
     )
 
 
-    # Apply date + duration filters
-    query = apply_mobile_filters(
-        query,
-        min_duration=min_duration,
-        max_duration=max_duration,
-        start_date=start_date,
-        end_date=end_date,
-    )
-
-
-    # Invalid callers should not contribute
-    # towards determining the most common CLD.
+    # Only valid caller numbers should
+    # contribute to the forwarded number.
+    #
+    # IMPORTANT:
+    # No date or duration filters here.
     query = apply_valid_cli_filter(
         query
     )
@@ -218,18 +203,15 @@ def get_most_common_cld(
 
 
     if row is None:
-
         return None
 
 
     return {
-
         "cld":
             row.cld,
 
         "count":
             row.count,
-
     }
 
 
@@ -269,15 +251,7 @@ def get_filtered_mobile_calls(
 
     else:
 
-        most_common = (
-            get_most_common_cld(
-                db,
-                min_duration=min_duration,
-                max_duration=max_duration,
-                start_date=start_date,
-                end_date=end_date,
-            )
-        )
+        most_common = get_most_common_cld( db)
 
 
         if most_common is None:

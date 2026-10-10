@@ -13,7 +13,7 @@ import "react-day-picker/style.css";
 import "./MobileDashboardFilters.css";
 
 
-interface MobileDashboardFiltersProps {
+type MobileDashboardFiltersProps = {
     startDate: string;
     endDate: string;
 
@@ -21,6 +21,15 @@ interface MobileDashboardFiltersProps {
     maxDate: string | null;
 
     minDuration: number;
+    maxDuration: number | null;
+
+    viewMode: "forwarded" | "website";
+    selectedCld: string | null;
+
+    trackingNumbers: {
+        cld: string;
+        website: string;
+    }[];
 
     onStartDateChange: (
         value: string
@@ -34,8 +43,20 @@ interface MobileDashboardFiltersProps {
         value: number
     ) => void;
 
+    onMaxDurationChange: (
+        value: number | null
+    ) => void;
+
+    onViewModeChange: (
+        value: "forwarded" | "website"
+    ) => void;
+
+    onSelectedCldChange: (
+        value: string | null
+    ) => void;
+
     onClearFilters: () => void;
-}
+};
 
 
 /* =========================================
@@ -45,6 +66,7 @@ interface MobileDashboardFiltersProps {
 function normalizeDateString(
     value: string
 ): string {
+
     if (!value) {
         return "";
     }
@@ -56,8 +78,11 @@ function normalizeDateString(
 function parseDate(
     value: string
 ): Date {
+
     const normalized =
-        normalizeDateString(value);
+        normalizeDateString(
+            value
+        );
 
     const [
         year,
@@ -78,20 +103,29 @@ function parseDate(
 function formatDate(
     date: Date
 ): string {
+
     const year =
         date.getFullYear();
 
     const month =
         String(
             date.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
     const day =
         String(
             date.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
-    return `${year}-${month}-${day}`;
+    return (
+        `${year}-${month}-${day}`
+    );
 }
 
 
@@ -99,13 +133,19 @@ function extractTime(
     value: string,
     fallback: string
 ): string {
-    if (!value.includes("T")) {
+
+    if (
+        !value.includes("T")
+    ) {
         return fallback;
     }
 
     return value
         .split("T")[1]
-        .slice(0, 5);
+        .slice(
+            0,
+            5
+        );
 }
 
 
@@ -114,6 +154,7 @@ function combineDateAndTime(
     time: string,
     seconds: string
 ): string {
+
     return (
         `${formatDate(date)}T` +
         `${time}:${seconds}`
@@ -124,18 +165,24 @@ function combineDateAndTime(
 function displayDate(
     value: string
 ): string {
+
     if (!value) {
         return "";
     }
 
     const date =
-        parseDate(value);
+        parseDate(
+            value
+        );
 
     return date.toLocaleDateString(
         "en-AU",
         {
-            day: "2-digit",
-            month: "short",
+            day:
+                "2-digit",
+
+            month:
+                "short",
         }
     );
 }
@@ -144,13 +191,57 @@ function displayDate(
 function displayTime(
     value: string
 ): string {
-    if (!value.includes("T")) {
+
+    if (
+        !value.includes("T")
+    ) {
         return "";
     }
 
     return value
         .split("T")[1]
-        .slice(0, 5);
+        .slice(
+            0,
+            5
+        );
+}
+
+
+/* =========================================
+   Phone formatting
+========================================= */
+
+function formatTrackingNumber(
+    value: string
+): string {
+
+    const digits =
+        value.replace(
+            /\D/g,
+            ""
+        );
+
+    if (
+        digits.startsWith("61") &&
+        digits.length === 11
+    ) {
+
+        return (
+            `+61 ${digits.slice(
+                2,
+                5
+            )} ` +
+            `${digits.slice(
+                5,
+                8
+            )} ` +
+            `${digits.slice(
+                8
+            )}`
+        );
+    }
+
+    return value;
 }
 
 
@@ -159,6 +250,7 @@ function displayTime(
 ========================================= */
 
 export default function MobileDashboardFilters({
+
     startDate,
     endDate,
 
@@ -166,24 +258,41 @@ export default function MobileDashboardFilters({
     maxDate,
 
     minDuration,
+    maxDuration,
+
+    viewMode,
+    selectedCld,
+
+    trackingNumbers,
 
     onStartDateChange,
     onEndDateChange,
 
     onMinDurationChange,
+    onMaxDurationChange,
+
+    onViewModeChange,
+    onSelectedCldChange,
 
     onClearFilters,
+
 }: MobileDashboardFiltersProps) {
+
 
     const [
         calendarOpen,
         setCalendarOpen,
-    ] = useState(false);
+    ] = useState(
+        false
+    );
 
 
     const initialRange =
-        useMemo<DateRange | undefined>(
+        useMemo<
+            DateRange | undefined
+        >(
             () => {
+
                 if (
                     !startDate ||
                     !endDate
@@ -192,13 +301,15 @@ export default function MobileDashboardFilters({
                 }
 
                 return {
-                    from: parseDate(
-                        startDate
-                    ),
+                    from:
+                        parseDate(
+                            startDate
+                        ),
 
-                    to: parseDate(
-                        endDate
-                    ),
+                    to:
+                        parseDate(
+                            endDate
+                        ),
                 };
             },
             [
@@ -245,7 +356,9 @@ export default function MobileDashboardFilters({
         setDateTimeError,
     ] = useState<
         string | null
-    >(null);
+    >(
+        null
+    );
 
 
     /* =====================================
@@ -258,15 +371,19 @@ export default function MobileDashboardFilters({
             startDate &&
             endDate
         ) {
-            setDraftRange({
-                from: parseDate(
-                    startDate
-                ),
 
-                to: parseDate(
-                    endDate
-                ),
+            setDraftRange({
+                from:
+                    parseDate(
+                        startDate
+                    ),
+
+                to:
+                    parseDate(
+                        endDate
+                    ),
             });
+
 
             setStartTime(
                 extractTime(
@@ -274,6 +391,7 @@ export default function MobileDashboardFilters({
                     "00:00"
                 )
             );
+
 
             setEndTime(
                 extractTime(
@@ -283,10 +401,17 @@ export default function MobileDashboardFilters({
             );
         }
 
-        setDateTimeError(null);
+
+        setDateTimeError(
+            null
+        );
+
 
         setCalendarOpen(
-            (current) => !current
+            (
+                current
+            ) =>
+                !current
         );
     }
 
@@ -299,9 +424,14 @@ export default function MobileDashboardFilters({
         range:
             DateRange | undefined
     ) {
-        setDraftRange(range);
 
-        setDateTimeError(null);
+        setDraftRange(
+            range
+        );
+
+        setDateTimeError(
+            null
+        );
     }
 
 
@@ -315,17 +445,27 @@ export default function MobileDashboardFilters({
 
         if (
             minDate &&
-            date < parseDate(minDate)
+            date <
+                parseDate(
+                    minDate
+                )
         ) {
+
             return true;
         }
 
+
         if (
             maxDate &&
-            date > parseDate(maxDate)
+            date >
+                parseDate(
+                    maxDate
+                )
         ) {
+
             return true;
         }
+
 
         return false;
     }
@@ -337,12 +477,16 @@ export default function MobileDashboardFilters({
 
     function handleApplyDateTime() {
 
-        setDateTimeError(null);
+        setDateTimeError(
+            null
+        );
+
 
         if (
             !draftRange?.from ||
             !draftRange?.to
         ) {
+
             setDateTimeError(
                 "Select both a start and end date."
             );
@@ -371,6 +515,7 @@ export default function MobileDashboardFilters({
             endDateTime <
             startDateTime
         ) {
+
             setDateTimeError(
                 "End date and time must be after the start date and time."
             );
@@ -383,11 +528,42 @@ export default function MobileDashboardFilters({
             startDateTime
         );
 
+
         onEndDateChange(
             endDateTime
         );
 
-        setCalendarOpen(false);
+
+        setCalendarOpen(
+            false
+        );
+    }
+
+
+    /* =====================================
+       View mode
+    ===================================== */
+
+    function handleViewModeChange(
+        value:
+            "forwarded" |
+            "website"
+    ) {
+
+        onViewModeChange(
+            value
+        );
+
+
+        if (
+            value ===
+            "forwarded"
+        ) {
+
+            onSelectedCldChange(
+                null
+            );
+        }
     }
 
 
@@ -401,32 +577,100 @@ export default function MobileDashboardFilters({
             undefined
         );
 
+
         setStartTime(
             "00:00"
         );
+
 
         setEndTime(
             "23:59"
         );
 
+
         setDateTimeError(
             null
         );
 
+
         setCalendarOpen(
             false
         );
+
 
         onClearFilters();
     }
 
 
     return (
+
         <div className="mobile-dashboard-filters">
 
-            {/* =============================
+
+            {/* =================================
+                View mode
+            ================================= */}
+
+            <div className="mobile-filter-group mobile-view-mode-group">
+
+                <label>
+                    View
+                </label>
+
+
+                <div className="mobile-view-mode">
+
+                    <button
+                        type="button"
+
+                        className={
+                            viewMode ===
+                            "forwarded"
+
+                                ? "mobile-view-mode-button active"
+
+                                : "mobile-view-mode-button"
+                        }
+
+                        onClick={() =>
+                            handleViewModeChange(
+                                "forwarded"
+                            )
+                        }
+                    >
+                        Forwarded Number
+                    </button>
+
+
+                    <button
+                        type="button"
+
+                        className={
+                            viewMode ===
+                            "website"
+
+                                ? "mobile-view-mode-button active"
+
+                                : "mobile-view-mode-button"
+                        }
+
+                        onClick={() =>
+                            handleViewModeChange(
+                                "website"
+                            )
+                        }
+                    >
+                        Website / Tracking Number
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            {/* =================================
                 Date/time range
-            ============================= */}
+            ================================= */}
 
             <div className="mobile-filter-group mobile-date-filter">
 
@@ -439,7 +683,9 @@ export default function MobileDashboardFilters({
 
                     <button
                         type="button"
+
                         className="mobile-date-range-button"
+
                         onClick={
                             handleCalendarOpen
                         }
@@ -450,8 +696,10 @@ export default function MobileDashboardFilters({
                             {
                                 startDate &&
                                 endDate
+
                                     ? (
                                         <>
+
                                             {
                                                 displayDate(
                                                     startDate
@@ -481,14 +729,17 @@ export default function MobileDashboardFilters({
                                                     endDate
                                                 )
                                             }
+
                                         </>
                                     )
+
                                     : (
                                         "Select date and time"
                                     )
                             }
 
                         </span>
+
 
                         <span>
                             ▾
@@ -497,189 +748,208 @@ export default function MobileDashboardFilters({
                     </button>
 
 
-                    {calendarOpen && (
+                    {
+                        calendarOpen &&
+                        (
 
-                        <div className="mobile-calendar-popup">
+                            <div className="mobile-calendar-popup">
 
-                            <DayPicker
-                                mode="range"
+                                <DayPicker
 
-                                selected={
-                                    draftRange
-                                }
+                                    mode="range"
 
-                                onSelect={
-                                    handleDateSelect
-                                }
+                                    selected={
+                                        draftRange
+                                    }
 
-                                disabled={
-                                    isDateDisabled
-                                }
+                                    onSelect={
+                                        handleDateSelect
+                                    }
 
-                                defaultMonth={
-                                    draftRange?.from
-                                        ? draftRange.from
-                                        : minDate
+                                    disabled={
+                                        isDateDisabled
+                                    }
+
+                                    defaultMonth={
+                                        draftRange
+                                            ?.from
+
+                                            ? draftRange.from
+
+                                            : minDate
+
+                                                ? parseDate(
+                                                    minDate
+                                                )
+
+                                                : undefined
+                                    }
+
+                                    startMonth={
+                                        minDate
+
                                             ? parseDate(
                                                 minDate
                                             )
+
                                             : undefined
-                                }
+                                    }
 
-                                startMonth={
-                                    minDate
-                                        ? parseDate(
-                                            minDate
-                                        )
-                                        : undefined
-                                }
+                                    endMonth={
+                                        maxDate
 
-                                endMonth={
-                                    maxDate
-                                        ? parseDate(
-                                            maxDate
-                                        )
-                                        : undefined
-                                }
+                                            ? parseDate(
+                                                maxDate
+                                            )
 
-                                showOutsideDays={
-                                    false
-                                }
-                            />
+                                            : undefined
+                                    }
+
+                                    showOutsideDays={
+                                        false
+                                    }
+                                />
 
 
-                            <div className="mobile-calendar-help">
+                                <div className="mobile-calendar-help">
+
+                                    {
+                                        !draftRange?.from
+
+                                            ? "Select a start date"
+
+                                            : !draftRange.to
+
+                                                ? "Now select an end date"
+
+                                                : "Choose the start and end time"
+                                    }
+
+                                </div>
+
 
                                 {
-                                    !draftRange?.from
-                                        ? "Select a start date"
+                                    draftRange?.from &&
+                                    draftRange?.to &&
+                                    (
 
-                                        : !draftRange.to
-                                            ? "Now select an end date"
+                                        <div className="mobile-time-range-controls">
 
-                                            : "Choose the start and end time"
+                                            <div className="mobile-time-field">
+
+                                                <label>
+                                                    Start Time
+                                                </label>
+
+                                                <input
+                                                    type="time"
+
+                                                    value={
+                                                        startTime
+                                                    }
+
+                                                    onChange={(event) =>
+                                                        setStartTime(
+                                                            event
+                                                                .target
+                                                                .value
+                                                        )
+                                                    }
+                                                />
+
+                                            </div>
+
+
+                                            <div className="mobile-time-field">
+
+                                                <label>
+                                                    End Time
+                                                </label>
+
+                                                <input
+                                                    type="time"
+
+                                                    value={
+                                                        endTime
+                                                    }
+
+                                                    onChange={(event) =>
+                                                        setEndTime(
+                                                            event
+                                                                .target
+                                                                .value
+                                                        )
+                                                    }
+                                                />
+
+                                            </div>
+
+                                        </div>
+
+                                    )
                                 }
 
-                            </div>
 
+                                {
+                                    dateTimeError &&
+                                    (
 
-                            {
-                                draftRange?.from &&
-                                draftRange?.to &&
-                                (
+                                        <div className="mobile-date-time-error">
 
-                                    <div className="mobile-time-range-controls">
-
-                                        <div className="mobile-time-field">
-
-                                            <label>
-                                                Start Time
-                                            </label>
-
-                                            <input
-                                                type="time"
-
-                                                value={
-                                                    startTime
-                                                }
-
-                                                onChange={(
-                                                    event
-                                                ) =>
-                                                    setStartTime(
-                                                        event
-                                                            .target
-                                                            .value
-                                                    )
-                                                }
-                                            />
+                                            {
+                                                dateTimeError
+                                            }
 
                                         </div>
 
-
-                                        <div className="mobile-time-field">
-
-                                            <label>
-                                                End Time
-                                            </label>
-
-                                            <input
-                                                type="time"
-
-                                                value={
-                                                    endTime
-                                                }
-
-                                                onChange={(
-                                                    event
-                                                ) =>
-                                                    setEndTime(
-                                                        event
-                                                            .target
-                                                            .value
-                                                    )
-                                                }
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-                                )
-                            }
+                                    )
+                                }
 
 
-                            {
-                                dateTimeError &&
-                                (
-                                    <div className="mobile-date-time-error">
-                                        {
-                                            dateTimeError
+                                <div className="mobile-calendar-actions">
+
+                                    <button
+                                        type="button"
+
+                                        className="mobile-calendar-cancel-button"
+
+                                        onClick={() =>
+                                            setCalendarOpen(
+                                                false
+                                            )
                                         }
-                                    </div>
-                                )
-                            }
+                                    >
+                                        Cancel
+                                    </button>
 
 
-                            <div className="mobile-calendar-actions">
+                                    <button
+                                        type="button"
 
-                                <button
-                                    type="button"
-                                    className="mobile-calendar-cancel-button"
-                                    onClick={() =>
-                                        setCalendarOpen(
-                                            false
-                                        )
-                                    }
-                                >
-                                    Cancel
-                                </button>
+                                        className="mobile-calendar-apply-button"
 
+                                        onClick={
+                                            handleApplyDateTime
+                                        }
+                                    >
+                                        Apply
+                                    </button>
 
-                                <button
-                                    type="button"
-                                    className="mobile-calendar-apply-button"
-                                    onClick={
-                                        handleApplyDateTime
-                                    }
-                                >
-                                    Apply
-                                </button>
+                                </div>
 
                             </div>
 
-                        </div>
-
-                    )}
+                        )
+                    }
 
                 </div>
 
             </div>
 
 
-            {/* =============================
-                Duration
-            ============================= */}
+            {/* =================================
+                Duration range
+            ================================= */}
 
             <div className="mobile-filter-group">
 
@@ -698,25 +968,165 @@ export default function MobileDashboardFilters({
                         minDuration
                     }
 
-                    onChange={(
-                        event
-                    ) =>
-                        onMinDurationChange(
+                    onChange={(event) => {
+
+                        const value =
                             Number(
                                 event
                                     .target
                                     .value
+                            );
+
+
+                        onMinDurationChange(
+                            Math.max(
+                                0,
+                                value
                             )
-                        )
-                    }
+                        );
+                    }}
                 />
 
             </div>
 
 
-            {/* =============================
+            <div className="mobile-filter-group">
+
+                <label>
+                    Maximum Duration
+                </label>
+
+                <input
+                    className="mobile-filter-input"
+
+                    type="number"
+
+                    min="0"
+
+                    placeholder="Any"
+
+                    value={
+                        maxDuration
+                        ?? ""
+                    }
+
+                    onChange={(event) => {
+
+                        const value =
+                            event
+                                .target
+                                .value;
+
+
+                        if (
+                            value === ""
+                        ) {
+
+                            onMaxDurationChange(
+                                null
+                            );
+
+                            return;
+                        }
+
+
+                        onMaxDurationChange(
+                            Math.max(
+                                0,
+                                Number(
+                                    value
+                                )
+                            )
+                        );
+                    }}
+                />
+
+            </div>
+
+
+            {/* =================================
+                Website / CLD
+            ================================= */}
+
+            {
+                viewMode ===
+                "website" &&
+                (
+
+                    <div className="mobile-filter-group mobile-tracking-number-filter">
+
+                        <label>
+                            Website / Tracking Number
+                        </label>
+
+
+                        <select
+                            className="mobile-filter-input"
+
+                            value={
+                                selectedCld
+                                ?? ""
+                            }
+
+                            onChange={(event) => {
+
+                                const value =
+                                    event
+                                        .target
+                                        .value;
+
+
+                                onSelectedCldChange(
+                                    value ||
+                                    null
+                                );
+                            }}
+                        >
+
+                            <option value="">
+                                Select website
+                            </option>
+
+
+                            {
+                                trackingNumbers.map(
+                                    (
+                                        item
+                                    ) => (
+
+                                        <option
+                                            key={
+                                                item.cld
+                                            }
+
+                                            value={
+                                                item.cld
+                                            }
+                                        >
+
+                                            {
+                                                `${item.website} — ${formatTrackingNumber(
+                                                    item.cld
+                                                )}`
+                                            }
+
+                                        </option>
+
+                                    )
+                                )
+                            }
+
+                        </select>
+
+                    </div>
+
+                )
+            }
+
+
+            {/* =================================
                 Clear
-            ============================= */}
+            ================================= */}
 
             <div className="mobile-filter-group">
 
@@ -724,9 +1134,12 @@ export default function MobileDashboardFilters({
                     &nbsp;
                 </label>
 
+
                 <button
                     type="button"
+
                     className="mobile-clear-filters-button"
+
                     onClick={
                         handleClearFilters
                     }

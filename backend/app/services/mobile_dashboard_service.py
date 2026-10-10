@@ -8,6 +8,10 @@ from app.repositories.mobile_dashboard_repository import (
     get_filtered_mobile_calls,
 )
 
+from app.constants.mobile_tracking_numbers import (
+    get_tracking_number_options,
+)
+
 
 def get_mobile_summary(
     *,
@@ -269,6 +273,9 @@ def get_mobile_filter_options():
             )
         )
 
+        tracking_numbers = (
+            get_tracking_number_options()
+        )
 
         return {
 
@@ -284,5 +291,8 @@ def get_mobile_filter_options():
                     None,
 
             },
+
+            "tracking_numbers":
+                tracking_numbers,
 
         }

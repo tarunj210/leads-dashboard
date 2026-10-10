@@ -14,17 +14,25 @@ if (!API_BASE_URL) {
    Filter options
 ========================================= */
 
+export type MobileTrackingNumber = {
+  cld: string;
+  website: string;
+};
+
+
 export type MobileFilterOptions = {
 
-    date_range: {
-        min_date: string | null;
-        max_date: string | null;
-    };
+  date_range: {
+      min_date: string | null;
+      max_date: string | null;
+  };
 
-    duration: {
-        default_min: number;
-        default_max: number | null;
-    };
+  duration: {
+      default_min: number;
+      default_max: number | null;
+  };
+
+  tracking_numbers: MobileTrackingNumber[];
 };
 
 

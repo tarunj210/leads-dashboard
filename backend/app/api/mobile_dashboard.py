@@ -12,6 +12,10 @@ from app.services.mobile_dashboard_service import (
     get_mobile_calls,
 )
 
+from app.constants.mobile_tracking_numbers import (
+    is_valid_tracking_number,
+)
+
 
 router = APIRouter(
     prefix="/api/mobile-dashboard",
@@ -96,19 +100,30 @@ def mobile_dashboard_summary(
             )
 
 
-        if (
-            view_mode == "website"
-            and
-            not selected_cld
-        ):
+        if view_mode == "website":
 
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "selected_cld is required "
-                    "when view_mode='website'"
-                ),
-            )
+            if not selected_cld:
+
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "selected_cld is required "
+                        "when view_mode='website'"
+                    ),
+                )
+
+
+            if not is_valid_tracking_number(
+                selected_cld
+            ):
+
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "selected_cld is not an "
+                        "approved website tracking number"
+                    ),
+                )
 
 
         return get_mobile_summary(
@@ -212,19 +227,30 @@ def mobile_dashboard_calls(
             )
 
 
-        if (
-            view_mode == "website"
-            and
-            not selected_cld
-        ):
+        if view_mode == "website":
 
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "selected_cld is required "
-                    "when view_mode='website'"
-                ),
-            )
+            if not selected_cld:
+
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "selected_cld is required "
+                        "when view_mode='website'"
+                    ),
+                )
+
+
+            if not is_valid_tracking_number(
+                selected_cld
+            ):
+
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "selected_cld is not an "
+                        "approved website tracking number"
+                    ),
+                )
 
 
         return get_mobile_calls(

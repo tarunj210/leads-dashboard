@@ -144,46 +144,46 @@ export default function MobileDashboard({
     async function loadFilterOptions() {
 
         try {
-    
+
             const options =
                 await fetchMobileFilterOptions();
-    
-    
+
+
             setFilterOptions(
                 options
             );
-    
-    
+
+
             if (
                 !filters.startDate ||
                 !filters.endDate
             ) {
-    
+
                 onFiltersChange({
-    
+
                     ...filters,
-    
+
                     startDate:
                         filters.startDate ||
                         options.date_range.min_date ||
                         "",
-    
+
                     endDate:
                         filters.endDate ||
                         options.date_range.max_date ||
                         "",
-    
+
                 });
             }
-    
+
         } catch (err) {
-    
+
             console.error(
                 "Failed to load mobile filter options:",
                 err
             );
-    
-    
+
+
             setError(
                 err instanceof Error
                     ? err.message
@@ -1137,49 +1137,80 @@ export default function MobileDashboard({
                     minDuration
                 }
 
-                onStartDateChange={(
-                    value
-                ) => {
-                
+                maxDuration={
+                    maxDuration
+                }
+
+                viewMode={
+                    viewMode
+                }
+
+                selectedCld={
+                    selectedCld
+                }
+
+                trackingNumbers={
+                    filterOptions
+                        ?.tracking_numbers
+                    ?? []
+                }
+
+                onStartDateChange={(value) => {
+
                     onFiltersChange({
-                
                         ...filters,
-                
-                        startDate:
-                            value,
-                
+                        startDate: value,
                     });
-                
+
                 }}
 
-                onEndDateChange={(
-                    value
-                ) => {
-                
+                onEndDateChange={(value) => {
+
                     onFiltersChange({
-                
                         ...filters,
-                
-                        endDate:
-                            value,
-                
+                        endDate: value,
                     });
-                
+
                 }}
 
-                onMinDurationChange={(
-                    value
-                ) => {
-                
+                onMinDurationChange={(value) => {
+
                     onFiltersChange({
-                
                         ...filters,
-                
-                        minDuration:
-                            value,
-                
+                        minDuration: value,
                     });
-                
+
+                }}
+
+                onMaxDurationChange={(value) => {
+
+                    onFiltersChange({
+                        ...filters,
+                        maxDuration: value,
+                    });
+
+                }}
+
+                onViewModeChange={(value) => {
+
+                    onFiltersChange({
+                        ...filters,
+                        viewMode: value,
+                        selectedCld:
+                            value === "forwarded"
+                                ? null
+                                : filters.selectedCld,
+                    });
+
+                }}
+
+                onSelectedCldChange={(value) => {
+
+                    onFiltersChange({
+                        ...filters,
+                        selectedCld: value,
+                    });
+
                 }}
 
                 onClearFilters={
@@ -1260,10 +1291,10 @@ export default function MobileDashboard({
                             subtitle={
 
                                 summary.total_calls >
-                                summary.unique_cli
+                                    summary.unique_cli
 
                                     ? `${summary.total_calls -
-                                        summary.unique_cli
+                                    summary.unique_cli
                                     } called more than once`
 
                                     : "No repeat callers"

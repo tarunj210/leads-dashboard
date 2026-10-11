@@ -287,21 +287,56 @@ def normalize_dates(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
 
-    print("RAW DATE VALUES:")
-    print(df["lead_received_date"].head(10).tolist())
+    df = df.copy()
 
-    df["lead_received_date"] = pd.to_datetime(
+    print(
+        "RAW DATE VALUES:",
+        df["lead_received_date"]
+        .head(10)
+        .tolist(),
+        flush=True,
+    )
+
+
+    numeric_dates = pd.to_numeric(
         df["lead_received_date"],
+        errors="coerce",
+    )
+
+
+    parsed_numeric = pd.to_datetime(
+        numeric_dates,
         unit="D",
         origin="1899-12-30",
         errors="coerce",
     )
 
-    print("PARSED DATE VALUES:")
-    print(df["lead_received_date"].head(10).tolist())
+
+    parsed_text = pd.to_datetime(
+        df["lead_received_date"],
+        dayfirst=True,
+        errors="coerce",
+    )
+
+
+    df["lead_received_date"] = (
+        parsed_numeric
+        .fillna(
+            parsed_text
+        )
+    )
+
+
+    print(
+        "PARSED DATE VALUES:",
+        df["lead_received_date"]
+        .head(10)
+        .tolist(),
+        flush=True,
+    )
+
 
     return df
-
 def normalize_status(
     df: pd.DataFrame,
 ) -> pd.DataFrame:

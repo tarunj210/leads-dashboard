@@ -4,7 +4,8 @@ from app.services.dashboard_service import (
     get_summary,
     get_filters,
     get_data,
-    get_leads
+    get_leads,
+    get_unique_email_leads,
 )
 
 
@@ -108,6 +109,50 @@ def dashboard_leads(
         )
 
     except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        )
+
+@router.get("/unique-emails")
+def dashboard_unique_emails(
+    start_date: datetime | None = Query(
+        None
+    ),
+
+    end_date: datetime | None = Query(
+        None
+    ),
+
+    service: str = Query(
+        "all"
+    ),
+
+    domain: str = Query(
+        "all"
+    ),
+
+    page_name: str = Query(
+        "all"
+    ),
+
+    status: str = Query(
+        "all"
+    ),
+):
+    try:
+
+        return get_unique_email_leads(
+            start_date=start_date,
+            end_date=end_date,
+            service=service,
+            domain=domain,
+            page_name=page_name,
+            status=status,
+        )
+
+    except Exception as exc:
+
         raise HTTPException(
             status_code=500,
             detail=str(exc),

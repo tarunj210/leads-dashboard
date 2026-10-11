@@ -53,6 +53,7 @@ from app.database import SessionLocal
 from app.repositories.dashboard_repository import (
     get_dashboard_data,
     get_filtered_leads,
+    get_unique_emails
 )
 
 
@@ -97,4 +98,24 @@ def get_leads(
             status=status,
             page=page,
             page_size=page_size,
+        )
+
+def get_unique_email_leads(
+    start_date=None,
+    end_date=None,
+    service="all",
+    domain="all",
+    page_name="all",
+    status="all",
+):
+    with SessionLocal() as db:
+
+        return get_unique_emails(
+            db,
+            start_date=start_date,
+            end_date=end_date,
+            service=service,
+            domain=domain,
+            page_name=page_name,
+            status=status,
         )

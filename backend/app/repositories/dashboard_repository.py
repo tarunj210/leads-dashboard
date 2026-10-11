@@ -563,6 +563,83 @@ def get_filtered_leads(
         "total_pages": total_pages,
     }
 
+def get_unique_emails(
+    db,
+    *,
+    start_date=None,
+    end_date=None,
+    service="all",
+    domain="all",
+    page_name="all",
+    status="all",
+):
+    normalized_email = func.lower(
+        func.trim(
+            Lead.customer_email
+        )
+    )
+
+    query = db.query(
+        normalized_email.label(
+            "email"
+        ),
+        func.count(
+            Lead.id
+        ).label(
+            "lead_count"
+        ),
+    )
+
+    query = apply_lead_filters(
+        query,
+        start_date=start_date,
+        end_date=end_date,
+        service=service,
+        domain=domain,
+        page_name=page_name,
+        status=status,
+    )
+
+    rows = (
+        query
+        .filter(
+            Lead.customer_email.isnot(
+                None
+            )
+        )
+        .filter(
+            func.trim(
+                Lead.customer_email
+            ) != ""
+        )
+        .group_by(
+            normalized_email
+        )
+        .order_by(
+            normalized_email.asc()
+        )
+        .all()
+    )
+
+    items = [
+        {
+            "email":
+                row.email,
+
+            "lead_count":
+                row.lead_count,
+        }
+        for row in rows
+    ]
+
+    return {
+        "total":
+            len(items),
+
+        "items":
+            items,
+    }
+
 def get_leads_over_time(
     db,
     *,

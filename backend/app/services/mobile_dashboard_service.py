@@ -290,3 +290,69 @@ def get_mobile_filter_options():
                 tracking_numbers,
 
         }
+
+def get_mobile_unique_numbers(
+    *,
+    min_duration: int = 60,
+    max_duration: int | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    view_mode: str = "forwarded",
+    selected_cld: str | None = None,
+):
+    with SessionLocal() as db:
+
+        rows = get_filtered_mobile_calls(
+            db,
+            min_duration=min_duration,
+            max_duration=max_duration,
+            start_date=start_date,
+            end_date=end_date,
+            view_mode=view_mode,
+            selected_cld=selected_cld,
+        )
+
+
+        counts = {}
+
+        for row in rows:
+
+            if not row.cli:
+                continue
+
+            cli = row.cli.strip()
+
+            counts[cli] = (
+                counts.get(
+                    cli,
+                    0
+                )
+                + 1
+            )
+
+
+        items = [
+            {
+                "cli":
+                    cli,
+
+                "call_count":
+                    call_count,
+            }
+
+            for (
+                cli,
+                call_count
+            ) in sorted(
+                counts.items()
+            )
+        ]
+
+
+        return {
+            "total":
+                len(items),
+
+            "items":
+                items,
+        }

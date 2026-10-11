@@ -110,6 +110,22 @@ export type MobileCallsResponse = {
 
 
 /* =========================================
+   Unique numbers
+========================================= */
+
+export type MobileUniqueNumber = {
+    cli: string;
+    call_count: number;
+};
+
+
+export type MobileUniqueNumbersResponse = {
+    total: number;
+    items: MobileUniqueNumber[];
+};
+
+
+/* =========================================
    Request filters
 ========================================= */
 
@@ -364,6 +380,58 @@ export async function fetchMobileCalls(
 
         throw new Error(
             "Failed to load mobile calls"
+        );
+    }
+
+
+    return (
+        response.json()
+    );
+}
+
+/* =========================================
+   Unique numbers
+========================================= */
+
+export async function fetchMobileUniqueNumbers(
+    filters: MobileDashboardFilters,
+): Promise<MobileUniqueNumbersResponse> {
+
+    const query =
+        buildQuery({
+
+            startDate:
+                filters.startDate,
+
+            endDate:
+                filters.endDate,
+
+            minDuration:
+                filters.minDuration,
+
+            maxDuration:
+                filters.maxDuration,
+
+            viewMode:
+                filters.viewMode,
+
+            selectedCld:
+                filters.selectedCld,
+        });
+
+
+    const response =
+        await fetch(
+            `${API_BASE_URL}/api/mobile-dashboard/unique-numbers?${query}`
+        );
+
+
+    if (
+        !response.ok
+    ) {
+
+        throw new Error(
+            "Failed to load unique mobile numbers"
         );
     }
 

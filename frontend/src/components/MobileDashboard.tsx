@@ -11,7 +11,9 @@ import {
     fetchMobileCalls,
     fetchMobileFilterOptions,
     fetchMobileSummary,
+    fetchMobileUniqueNumbers,
     type MobileCall,
+    type MobileUniqueNumber,
     type MobileFilterOptions,
     type MobileSummary,
 } from "../api/mobileDashboard";
@@ -108,6 +110,32 @@ export default function MobileDashboard({
         totalCalls,
         setTotalCalls,
     ] = useState(0);
+
+
+    /* =========================================
+       Table view
+    ========================================= */
+
+    const [
+        tableView,
+        setTableView,
+    ] = useState<
+        "calls" | "unique"
+    >("calls");
+
+
+    const [
+        uniqueNumbers,
+        setUniqueNumbers,
+    ] = useState<
+        MobileUniqueNumber[]
+    >([]);
+
+
+    const [
+        uniqueNumbersLoading,
+        setUniqueNumbersLoading,
+    ] = useState(false);
 
 
     /* =========================================
@@ -346,6 +374,60 @@ export default function MobileDashboard({
 
 
     /* =========================================
+       Load unique numbers
+    ========================================= */
+
+    async function loadUniqueNumbers() {
+        try {
+            setUniqueNumbersLoading(
+                true
+            );
+
+            setError(
+                null
+            );
+
+            const data =
+                await fetchMobileUniqueNumbers({
+                    startDate:
+                        startDate ||
+                        undefined,
+
+                    endDate:
+                        endDate ||
+                        undefined,
+
+                    minDuration,
+                    maxDuration,
+                    viewMode,
+                    selectedCld,
+                });
+
+            setUniqueNumbers(
+                data.items
+            );
+
+        } catch (err) {
+            console.error(
+                "Failed to load unique mobile numbers:",
+                err
+            );
+
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to load unique mobile numbers"
+            );
+
+        } finally {
+            setUniqueNumbersLoading(
+                false
+            );
+        }
+    }
+
+
+    /* =========================================
        Export currently loaded rows
     ========================================= */
 
@@ -446,6 +528,87 @@ export default function MobileDashboard({
     }
 
 
+    function exportUniqueNumbersToCsv() {
+        if (
+            uniqueNumbers.length === 0
+        ) {
+            return;
+        }
+
+        const rows = [
+            [
+                "Caller",
+                "Call Count",
+            ],
+            ...uniqueNumbers.map(
+                (item) => [
+                    item.cli,
+                    item.call_count,
+                ]
+            ),
+        ];
+
+        const csvContent =
+            rows
+                .map(
+                    (row) =>
+                        row
+                            .map(
+                                (value) =>
+                                    `"${String(
+                                        value
+                                    ).replace(
+                                        /"/g,
+                                        '""'
+                                    )}"`
+                            )
+                            .join(",")
+                )
+                .join("\n");
+
+        const blob =
+            new Blob(
+                [
+                    csvContent
+                ],
+                {
+                    type:
+                        "text/csv;charset=utf-8;",
+                }
+            );
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+        link.href =
+            url;
+
+        link.download =
+            "unique-mobile-numbers.csv";
+
+        document.body.appendChild(
+            link
+        );
+
+        link.click();
+
+        document.body.removeChild(
+            link
+        );
+
+        URL.revokeObjectURL(
+            url
+        );
+    }
+
+
     /* =========================================
        Header refresh
     ========================================= */
@@ -480,6 +643,10 @@ export default function MobileDashboard({
                 );
 
                 setCalls(
+                    []
+                );
+
+                setUniqueNumbers(
                     []
                 );
 
@@ -925,6 +1092,48 @@ export default function MobileDashboard({
             );
         },
         [
+            filterOptions,
+            startDate,
+            endDate,
+            minDuration,
+            maxDuration,
+            viewMode,
+            selectedCld,
+        ]
+    );
+
+
+    
+
+
+    /* =========================================
+       Unique-number view
+    ========================================= */
+
+    useEffect(
+        () => {
+            if (
+                tableView !== "unique" ||
+                !filterOptions
+            ) {
+                return;
+            }
+
+            if (
+                viewMode === "website" &&
+                !selectedCld
+            ) {
+                setUniqueNumbers(
+                    []
+                );
+
+                return;
+            }
+
+            loadUniqueNumbers();
+        },
+        [
+            tableView,
             filterOptions,
             startDate,
             endDate,
@@ -1446,10 +1655,65 @@ export default function MobileDashboard({
 
 
             {/* =================================
+                Data view
+            ================================= */}
+
+            {
+                (
+                    viewMode === "forwarded" ||
+                    selectedCld
+                ) &&
+                (
+                    <div className="mobile-subtabs">
+
+                        <button
+                            type="button"
+
+                            className={
+                                tableView === "calls"
+                                    ? "mobile-subtab active"
+                                    : "mobile-subtab"
+                            }
+
+                            onClick={() =>
+                                setTableView(
+                                    "calls"
+                                )
+                            }
+                        >
+                            Calls
+                        </button>
+
+
+                        <button
+                            type="button"
+
+                            className={
+                                tableView === "unique"
+                                    ? "mobile-subtab active"
+                                    : "mobile-subtab"
+                            }
+
+                            onClick={() =>
+                                setTableView(
+                                    "unique"
+                                )
+                            }
+                        >
+                            Unique Numbers
+                        </button>
+
+                    </div>
+                )
+            }
+
+
+            {/* =================================
                 Calls table
             ================================= */}
 
             {
+                tableView === "calls" &&
                 (
                     viewMode === "forwarded" ||
                     selectedCld
@@ -1732,6 +1996,155 @@ export default function MobileDashboard({
                                         )
                                     )
                             }
+
+                        </div>
+
+                    </div>
+                )
+            }
+
+
+            {/* =================================
+                Unique numbers table
+            ================================= */}
+
+            {
+                tableView === "unique" &&
+                (
+                    viewMode === "forwarded" ||
+                    selectedCld
+                ) &&
+                (
+                    <div className="mobile-table-card">
+
+                        <div className="mobile-table-header">
+
+                            <div>
+
+                                <h2>
+                                    Unique Numbers
+                                </h2>
+
+                                <p className="mobile-table-subtitle">
+                                    Unique caller numbers for the selected filters and time range.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                className="mobile-export-button"
+                                onClick={
+                                    exportUniqueNumbersToCsv
+                                }
+                                disabled={
+                                    uniqueNumbers.length === 0
+                                }
+                            >
+                                ↓&nbsp;&nbsp;Export CSV
+                            </button>
+
+                        </div>
+
+
+                        {
+                            uniqueNumbersLoading &&
+                            (
+                                <div className="mobile-table-loading">
+                                    Loading unique numbers...
+                                </div>
+                            )
+                        }
+
+
+                        <div className="mobile-table-scroll">
+
+                            <table className="mobile-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Caller
+                                        </th>
+
+                                        <th>
+                                            Call Count
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody>
+
+                                    {
+                                        uniqueNumbers.length === 0
+                                            ? (
+                                                <tr>
+
+                                                    <td
+                                                        colSpan={
+                                                            2
+                                                        }
+                                                        className="mobile-table-empty"
+                                                    >
+                                                        {
+                                                            uniqueNumbersLoading
+                                                                ? "Loading unique numbers..."
+                                                                : "No unique numbers found for the selected filters."
+                                                        }
+                                                    </td>
+
+                                                </tr>
+                                            )
+                                            : (
+                                                uniqueNumbers.map(
+                                                    (item) => (
+                                                        <tr
+                                                            key={
+                                                                item.cli
+                                                            }
+                                                        >
+
+                                                            <td className="mobile-caller-cell">
+                                                                {
+                                                                    formatAustralianPhone(
+                                                                        item.cli
+                                                                    )
+                                                                }
+                                                            </td>
+
+                                                            <td>
+                                                                {
+                                                                    item.call_count
+                                                                }
+                                                            </td>
+
+                                                        </tr>
+                                                    )
+                                                )
+                                            )
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+                        <div className="mobile-pagination">
+
+                            <span className="mobile-pagination-summary">
+                                {
+                                    uniqueNumbers.length
+                                }
+                                {" "}unique numbers
+                            </span>
 
                         </div>
 

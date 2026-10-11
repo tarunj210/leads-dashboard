@@ -9,6 +9,8 @@ import type {
 
 import {
     getDashboardData,
+    getUniqueEmails,
+    type UniqueEmailItem,
 } from "../api/dashboard";
 
 import {
@@ -183,6 +185,32 @@ export default function DashboardPage({
 
 
     // =========================================
+    // Lead table view
+    // =========================================
+
+    const [
+        tableView,
+        setTableView,
+    ] = useState<
+        "leads" | "unique"
+    >("leads");
+
+
+    const [
+        uniqueEmails,
+        setUniqueEmails,
+    ] = useState<
+        UniqueEmailItem[]
+    >([]);
+
+
+    const [
+        uniqueEmailsLoading,
+        setUniqueEmailsLoading,
+    ] = useState(false);
+
+
+    // =========================================
     // Clear filters
     // =========================================
 
@@ -338,6 +366,166 @@ export default function DashboardPage({
         URL.revokeObjectURL(
             url
         );
+    }
+
+
+    function exportUniqueEmailsToCsv() {
+
+        if (
+            uniqueEmails.length === 0
+        ) {
+            return;
+        }
+
+
+        const rows = [
+
+            [
+                "Email",
+                "Lead Count",
+            ],
+
+            ...uniqueEmails.map(
+                (item) => [
+                    item.email,
+                    item.lead_count,
+                ]
+            ),
+
+        ];
+
+
+        const csvContent =
+            rows
+                .map(
+                    (row) =>
+                        row
+                            .map(
+                                (value) =>
+                                    `"${String(
+                                        value
+                                    ).replace(
+                                        /"/g,
+                                        '""'
+                                    )}"`
+                            )
+                            .join(",")
+                )
+                .join("\n");
+
+
+        const blob =
+            new Blob(
+                [csvContent],
+                {
+                    type:
+                        "text/csv;charset=utf-8;",
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href =
+            url;
+
+        link.download =
+            "unique-emails.csv";
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        document.body.removeChild(
+            link
+        );
+
+
+        URL.revokeObjectURL(
+            url
+        );
+    }
+
+
+    // =========================================
+    // Load unique emails
+    // =========================================
+
+    async function loadUniqueEmails() {
+
+        try {
+
+            setUniqueEmailsLoading(
+                true
+            );
+
+
+            setError(
+                null
+            );
+
+
+            const data =
+                await getUniqueEmails({
+
+                    startDate:
+                        startDate ||
+                        undefined,
+
+                    endDate:
+                        endDate ||
+                        undefined,
+
+                    service,
+
+                    domain,
+
+                    pageName,
+
+                    status,
+
+                });
+
+
+            setUniqueEmails(
+                data.items
+            );
+
+        } catch (err) {
+
+            console.error(
+                "Failed to load unique emails:",
+                err
+            );
+
+
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to load unique emails"
+            );
+
+        } finally {
+
+            setUniqueEmailsLoading(
+                false
+            );
+        }
     }
 
 
@@ -678,6 +866,32 @@ export default function DashboardPage({
     ]);
 
     // =========================================
+    // Unique email view
+    // =========================================
+
+    useEffect(() => {
+
+        if (
+            tableView !== "unique"
+        ) {
+            return;
+        }
+
+
+        loadUniqueEmails();
+
+    }, [
+        tableView,
+        startDate,
+        endDate,
+        service,
+        domain,
+        pageName,
+        status,
+    ]);
+
+
+    // =========================================
     // Header refresh
     // =========================================
 
@@ -702,6 +916,13 @@ export default function DashboardPage({
             1,
             false
         );
+
+
+        if (
+            tableView === "unique"
+        ) {
+            loadUniqueEmails();
+        }
 
     }, [
         refreshKey,
@@ -1293,105 +1514,295 @@ export default function DashboardPage({
 
 
             {/* =================================
-                Lead Details Table
+                Lead table views
             ================================= */}
 
-            <section
-                className="
-                    web-section-card
-                    web-leads-table-section
-                "
-            >
+            <div className="web-data-view-tabs">
 
-                <div className="web-section-header">
+                <button
+                    type="button"
 
-                    <div>
+                    className={
+                        tableView === "leads"
+                            ? "web-data-view-tab active"
+                            : "web-data-view-tab"
+                    }
 
-                        <h2>
-                            Lead details
-                        </h2>
-
-                        <p>
-                            Website enquiries matching
-                            the selected filters
-                        </p>
-
-                    </div>
+                    onClick={() =>
+                        setTableView(
+                            "leads"
+                        )
+                    }
+                >
+                    Leads
+                </button>
 
 
-                    <div className="web-table-actions">
+                <button
+                    type="button"
 
-                        <span className="web-table-count">
+                    className={
+                        tableView === "unique"
+                            ? "web-data-view-tab active"
+                            : "web-data-view-tab"
+                    }
+
+                    onClick={() =>
+                        setTableView(
+                            "unique"
+                        )
+                    }
+                >
+                    Unique Emails
+                </button>
+
+            </div>
+
+
+            {
+                tableView === "leads"
+                    ? (
+                        <section
+                            className="
+                                web-section-card
+                                web-leads-table-section
+                            "
+                        >
+
+                            <div className="web-section-header">
+
+                                <div>
+
+                                    <h2>
+                                        Lead details
+                                    </h2>
+
+                                    <p>
+                                        Website enquiries matching
+                                        the selected filters
+                                    </p>
+
+                                </div>
+
+
+                                <div className="web-table-actions">
+
+                                    <span className="web-table-count">
+
+                                        {
+                                            leadData?.total ??
+                                            summary.total_leads
+                                        }
+
+                                        {" "}leads
+
+                                    </span>
+
+
+                                    <button
+                                        type="button"
+                                        className="web-export-button"
+                                        onClick={
+                                            exportWebLeadsToCsv
+                                        }
+                                        disabled={
+                                            !leadData ||
+                                            leadData.items.length === 0
+                                        }
+                                    >
+                                        ↓&nbsp;&nbsp;Export CSV
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <LeadTable
+
+                                data={
+                                    leadData
+                                }
+
+                                loading={
+                                    tableLoading
+                                }
+
+                                onLoadMore={() => {
+
+                                    if (
+                                        !leadData ||
+                                        tableLoading
+                                    ) {
+
+                                        return;
+                                    }
+
+
+                                    if (
+                                        tablePage >=
+                                        leadData.total_pages
+                                    ) {
+
+                                        return;
+                                    }
+
+
+                                    loadLeadTable(
+                                        tablePage + 1,
+                                        true
+                                    );
+
+                                }}
+
+                            />
+
+                        </section>
+                    )
+                    : (
+                        <section
+                            className="
+                                web-section-card
+                                web-leads-table-section
+                            "
+                        >
+
+                            <div className="web-section-header">
+
+                                <div>
+
+                                    <h2>
+                                        Unique emails
+                                    </h2>
+
+                                    <p>
+                                        Unique customer email addresses
+                                        matching the selected filters
+                                    </p>
+
+                                </div>
+
+
+                                <div className="web-table-actions">
+
+                                    <span className="web-table-count">
+
+                                        {
+                                            uniqueEmails.length
+                                        }
+
+                                        {" "}unique emails
+
+                                    </span>
+
+
+                                    <button
+                                        type="button"
+                                        className="web-export-button"
+                                        onClick={
+                                            exportUniqueEmailsToCsv
+                                        }
+                                        disabled={
+                                            uniqueEmails.length === 0
+                                        }
+                                    >
+                                        ↓&nbsp;&nbsp;Export CSV
+                                    </button>
+
+                                </div>
+
+                            </div>
+
 
                             {
-                                leadData?.total ??
-                                summary.total_leads
+                                uniqueEmailsLoading &&
+                                (
+                                    <div className="web-unique-email-loading">
+                                        Loading unique emails...
+                                    </div>
+                                )
                             }
 
-                            {" "}leads
 
-                        </span>
+                            <div className="web-unique-email-table-scroll">
 
+                                <table className="web-unique-email-table">
 
-                        <button
-                            type="button"
-                            className="web-export-button"
-                            onClick={
-                                exportWebLeadsToCsv
-                            }
-                            disabled={
-                                !leadData ||
-                                leadData.items.length === 0
-                            }
-                        >
-                            ↓&nbsp;&nbsp;Export CSV
-                        </button>
+                                    <thead>
 
-                    </div>
+                                        <tr>
 
-                </div>
+                                            <th>
+                                                Email
+                                            </th>
+
+                                            <th>
+                                                Lead Count
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
 
 
-                <LeadTable
+                                    <tbody>
 
-                    data={
-                        leadData
-                    }
+                                        {
+                                            uniqueEmails.length === 0
+                                                ? (
+                                                    <tr>
 
-                    loading={
-                        tableLoading
-                    }
+                                                        <td
+                                                            colSpan={
+                                                                2
+                                                            }
+                                                            className="web-unique-email-empty"
+                                                        >
+                                                            {
+                                                                uniqueEmailsLoading
+                                                                    ? "Loading unique emails..."
+                                                                    : "No unique emails found for the selected filters."
+                                                            }
+                                                        </td>
 
-                    onLoadMore={() => {
+                                                    </tr>
+                                                )
+                                                : (
+                                                    uniqueEmails.map(
+                                                        (item) => (
+                                                            <tr
+                                                                key={
+                                                                    item.email
+                                                                }
+                                                            >
 
-                        if (
-                            !leadData ||
-                            tableLoading
-                        ) {
+                                                                <td>
+                                                                    {
+                                                                        item.email
+                                                                    }
+                                                                </td>
 
-                            return;
-                        }
+                                                                <td>
+                                                                    {
+                                                                        item.lead_count
+                                                                    }
+                                                                </td>
 
+                                                            </tr>
+                                                        )
+                                                    )
+                                                )
+                                        }
 
-                        if (
-                            tablePage >=
-                            leadData.total_pages
-                        ) {
+                                    </tbody>
 
-                            return;
-                        }
+                                </table>
 
+                            </div>
 
-                        loadLeadTable(
-                            tablePage + 1,
-                            true
-                        );
-
-                    }}
-
-                />
-
-            </section>
+                        </section>
+                    )
+            }
 
 
         </div>

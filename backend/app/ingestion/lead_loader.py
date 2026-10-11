@@ -39,14 +39,14 @@ SHEET_COLUMNS = [
     "Lead Received Date",
     "Customer Name",
     "Customer Email",
-    "Customer Service",
     "Customer Phone",
-    "Customer Address",
+    "Customer Service",
     "Customer Message",
+    "Customer Address",
+    "Our Comments",
     "Status (In Process / Booked / Not Booked)",
     "Page Url",
     "Page Name",
-    "Our Comments",
     "IP Address",
 ]
 

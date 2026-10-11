@@ -139,9 +139,7 @@ def sync_leads():
 
 # TEMPORARY:
 # Reset Web ingestion checkpoint.
-            state.last_processed_row = 2
-
-            db.commit()
+            
 
 
             start_row = (

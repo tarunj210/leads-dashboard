@@ -134,13 +134,14 @@ def sync_leads():
             # row 1 = metadata / other
             # row 2 = headers
             # row 3 onward = data
-            state = (
-                get_or_create_ingestion_state(
-                    db,
-                    source=WEB_SOURCE,
-                    initial_last_processed_row=2,
-                )
-            )
+            state = (get_or_create_ingestion_state(db,source=WEB_SOURCE,initial_last_processed_row=2,))
+
+
+# TEMPORARY:
+# Reset Web ingestion checkpoint.
+            state.last_processed_row = 2
+
+            db.commit()
 
 
             start_row = (

@@ -876,22 +876,254 @@
    Pagination
 ========================================= */
 
+/* =========================================
+   Mobile Dashboard Pagination
+========================================= */
+
 .mobile-pagination {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 14px 20px;
+
+    border-top: 1px solid #eef0f3;
+
+    background: #ffffff;
+
+    flex-wrap: wrap;
 }
 
+
+/* =========================================
+   Showing X-Y of Z
+========================================= */
 
 .mobile-pagination-summary {
     color: #667085;
 
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 500;
+
+    white-space: nowrap;
 }
 
 
-.mobile-pagination-actions {
-    display: flex;
+/* =========================================
+   Pagination controls
+========================================= */
 
+.mobile-pagination-controls {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================================
+   Rows per page
+========================================= */
+
+.mobile-pagination .pagination-page-size {
+    display: flex;
     align-items: center;
 
     gap: 8px;
+
+    color: #667085;
+
+    font-size: 12px;
+    font-weight: 500;
 }
+
+
+.mobile-pagination .pagination-page-size select {
+    height: 34px;
+
+    min-width: 68px;
+
+    padding:
+        0
+        28px
+        0
+        10px;
+
+    border: 1px solid #d0d5dd;
+
+    border-radius: 7px;
+
+    background-color: #ffffff;
+
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+}
+
+
+.mobile-pagination .pagination-page-size select:hover {
+    border-color: #98a2b3;
+}
+
+
+.mobile-pagination .pagination-page-size select:focus {
+    border-color: #667085;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            102,
+            112,
+            133,
+            0.12
+        );
+}
+
+
+.mobile-pagination .pagination-page-size select:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    background-color: #f9fafb;
+}
+
+
+/* =========================================
+   Previous / Next
+========================================= */
+
+.mobile-pagination-controls button {
+    height: 34px;
+
+    padding:
+        0
+        13px;
+
+    border: 1px solid #d0d5dd;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+.mobile-pagination-controls button:hover:not(:disabled) {
+    background: #f9fafb;
+
+    border-color: #98a2b3;
+}
+
+
+.mobile-pagination-controls button:focus-visible {
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            102,
+            112,
+            133,
+            0.12
+        );
+}
+
+
+.mobile-pagination-controls button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    background: #f9fafb;
+}
+
+
+/* =========================================
+   Page X of Y
+========================================= */
+
+.mobile-pagination-page {
+    min-width: 80px;
+
+    text-align: center;
+
+    color: #475467;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   Responsive
+========================================= */
+
+@media (
+    max-width: 700px
+) {
+
+    .mobile-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 12px;
+
+        padding:
+            14px
+            16px;
+    }
+
+
+    .mobile-pagination-controls {
+        width: 100%;
+
+        justify-content: flex-start;
+    }
+
+
+    .mobile-pagination .pagination-page-size {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+
+    .mobile-pagination .pagination-page-size select {
+        min-width: 80px;
+    }
+
+
+    .mobile-pagination-page {
+        min-width: auto;
+    }
+}
+
+

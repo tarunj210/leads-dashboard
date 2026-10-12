@@ -44,16 +44,10 @@ def build_datetime_range(
     end_datetime = None
 
 
-    normalized_start_date =
-        normalize_date(
-            start_date
-        )
+    normalized_start_date =normalize_date(start_date)
 
 
-    normalized_end_date =
-        normalize_date(
-            end_date
-        )
+    normalized_end_date =normalize_date(end_date)
 
 
     if normalized_start_date:
@@ -66,8 +60,7 @@ def build_datetime_range(
 
         try:
 
-            start_datetime =
-                datetime.strptime(
+            start_datetime =datetime.strptime(
                     (
                         f"{normalized_start_date} "
                         f"{effective_start_time}"

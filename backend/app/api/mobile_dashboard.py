@@ -246,10 +246,10 @@ def mobile_dashboard_calls(
     ),
 
     page_size: int = Query(
-        25,
-        ge=1,
-        le=100,
-    ),
+    25,
+    ge=1,
+    le=200,
+),
 ):
 
     try:

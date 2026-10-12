@@ -29,35 +29,18 @@ router = APIRouter(
 
 @router.get("/summary")
 def dashboard_summary(
-
-    start_date: str | None = Query(
-        None
+    date_range: str = Query(
+        "all"
     ),
-
-    start_time: str | None = Query(
-        None
-    ),
-
-    end_date: str | None = Query(
-        None
-    ),
-
-    end_time: str | None = Query(
-        None
-    ),
-
     service: str = Query(
         "all"
     ),
-
     domain: str = Query(
         "all"
     ),
-
     page_name: str = Query(
         "all"
     ),
-
     status: str = Query(
         "all"
     ),
@@ -65,34 +48,13 @@ def dashboard_summary(
 
     try:
 
-        (
-            start_datetime,
-            end_datetime,
-        ) = build_datetime_range(
-            start_date=start_date,
-            start_time=start_time,
-            end_date=end_date,
-            end_time=end_time,
-        )
-
-
         return get_summary(
-            start_date=start_datetime,
-            end_date=end_datetime,
+            date_range=date_range,
             service=service,
             domain=domain,
             page_name=page_name,
             status=status,
         )
-
-
-    except ValueError as exc:
-
-        raise HTTPException(
-            status_code=400,
-            detail=str(exc),
-        )
-
 
     except Exception as exc:
 
@@ -101,11 +63,14 @@ def dashboard_summary(
             detail=str(exc),
         )
 
+
 # =========================================
 # Existing filter options
 # =========================================
 
-@router.get("/filter-options")
+@router.get(
+    "/filter-options"
+)
 def dashboard_filter_options():
 
     try:
@@ -124,7 +89,9 @@ def dashboard_filter_options():
 # Dashboard data
 # =========================================
 
-@router.get("/data")
+@router.get(
+    "/data"
+)
 def dashboard_data(
 
     start_date: str | None = Query(
@@ -203,7 +170,9 @@ def dashboard_data(
 # Lead table
 # =========================================
 
-@router.get("/leads")
+@router.get(
+    "/leads"
+)
 def dashboard_leads(
 
     start_date: str | None = Query(
@@ -246,7 +215,7 @@ def dashboard_leads(
     page_size: int = Query(
         25,
         ge=1,
-        le=100,
+        le=200,
     ),
 ):
 
@@ -295,7 +264,9 @@ def dashboard_leads(
 # Unique emails
 # =========================================
 
-@router.get("/unique-emails")
+@router.get(
+    "/unique-emails"
+)
 def dashboard_unique_emails(
 
     start_date: str | None = Query(

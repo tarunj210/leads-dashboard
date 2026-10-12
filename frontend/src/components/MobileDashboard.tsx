@@ -39,10 +39,13 @@ type MobileDashboardProps = {
 
 
 export default function MobileDashboard({
+
     refreshKey,
     filters,
     onFiltersChange,
+
 }: MobileDashboardProps) {
+
 
     /* =========================================
        Filter metadata
@@ -102,6 +105,12 @@ export default function MobileDashboard({
         page,
         setPage,
     ] = useState(1);
+
+
+    const [
+        pageSize,
+        setPageSize,
+    ] = useState(25);
 
 
     const [
@@ -186,19 +195,25 @@ export default function MobileDashboard({
     ========================================= */
 
     async function loadFilterOptions() {
+
         try {
+
             const options =
                 await fetchMobileFilterOptions();
+
 
             setFilterOptions(
                 options
             );
 
+
             if (
                 !filters.startDate ||
                 !filters.endDate
             ) {
+
                 onFiltersChange({
+
                     ...filters,
 
                     startDate:
@@ -210,13 +225,17 @@ export default function MobileDashboard({
                         filters.endDate ||
                         options.date_range.max_date ||
                         "",
+
                 });
             }
+
         } catch (err) {
+
             console.error(
                 "Failed to load mobile filter options:",
                 err
             );
+
 
             setError(
                 err instanceof Error
@@ -232,56 +251,66 @@ export default function MobileDashboard({
     ========================================= */
 
     async function loadSummary() {
+
         try {
+
             setLoading(
                 true
             );
+
 
             setError(
                 null
             );
 
+
             const data =
                 await fetchMobileSummary({
+
                     startDate:
                         startDate ||
                         undefined,
 
-                    
                     startTime:
                         startTime ||
                         undefined,
 
-endDate:
+                    endDate:
                         endDate ||
                         undefined,
 
-                    
                     endTime:
                         endTime ||
                         undefined,
 
-minDuration,
+                    minDuration,
                     maxDuration,
                     viewMode,
                     selectedCld,
+
                 });
+
 
             setSummary(
                 data
             );
+
         } catch (err) {
+
             console.error(
                 "Failed to load mobile summary:",
                 err
             );
+
 
             setError(
                 err instanceof Error
                     ? err.message
                     : "Failed to load mobile dashboard"
             );
+
         } finally {
+
             setLoading(
                 false
             );
@@ -295,101 +324,94 @@ minDuration,
 
     async function loadCalls(
         currentPage: number,
-        append = false,
     ) {
+
         try {
+
             setTableLoading(
                 true
             );
+
 
             setError(
                 null
             );
 
+
             const data =
                 await fetchMobileCalls({
+
                     startDate:
                         startDate ||
                         undefined,
 
-                    
                     startTime:
                         startTime ||
                         undefined,
 
-endDate:
+                    endDate:
                         endDate ||
                         undefined,
 
-                    
                     endTime:
                         endTime ||
                         undefined,
 
-minDuration,
+                    minDuration,
+
                     maxDuration,
+
                     viewMode,
+
                     selectedCld,
 
                     page:
                         currentPage,
 
-                    pageSize:
-                        25,
+                    pageSize,
+
                 });
 
+
+            /*
+             * Normal pagination:
+             * replace current page rows.
+             */
             setCalls(
-                (current) => {
-                    if (!append) {
-                        return data.items;
-                    }
-
-                    const existingIds =
-                        new Set(
-                            current.map(
-                                (call) =>
-                                    call.id
-                            )
-                        );
-
-                    const newItems =
-                        data.items.filter(
-                            (call) =>
-                                !existingIds.has(
-                                    call.id
-                                )
-                        );
-
-                    return [
-                        ...current,
-                        ...newItems,
-                    ];
-                }
+                data.items
             );
+
 
             setPage(
                 currentPage
             );
 
+
             setTotalPages(
                 data.total_pages
             );
 
+
             setTotalCalls(
                 data.total
             );
+
         } catch (err) {
+
             console.error(
                 "Failed to load mobile calls:",
                 err
             );
+
 
             setError(
                 err instanceof Error
                     ? err.message
                     : "Failed to load mobile calls"
             );
+
         } finally {
+
             setTableLoading(
                 false
             );
@@ -402,50 +424,57 @@ minDuration,
     ========================================= */
 
     async function loadUniqueNumbers() {
+
         try {
+
             setUniqueNumbersLoading(
                 true
             );
+
 
             setError(
                 null
             );
 
+
             const data =
                 await fetchMobileUniqueNumbers({
+
                     startDate:
                         startDate ||
                         undefined,
 
-                    
                     startTime:
                         startTime ||
                         undefined,
 
-endDate:
+                    endDate:
                         endDate ||
                         undefined,
 
-                    
                     endTime:
                         endTime ||
                         undefined,
 
-minDuration,
+                    minDuration,
                     maxDuration,
                     viewMode,
                     selectedCld,
+
                 });
+
 
             setUniqueNumbers(
                 data.items
             );
 
         } catch (err) {
+
             console.error(
                 "Failed to load unique mobile numbers:",
                 err
             );
+
 
             setError(
                 err instanceof Error
@@ -454,6 +483,7 @@ minDuration,
             );
 
         } finally {
+
             setUniqueNumbersLoading(
                 false
             );
@@ -462,15 +492,17 @@ minDuration,
 
 
     /* =========================================
-       Export currently loaded rows
+       Export current page
     ========================================= */
 
     function exportMobileCallsToCsv() {
+
         if (
             calls.length === 0
         ) {
             return;
         }
+
 
         const headers = [
             "Connected",
@@ -478,6 +510,7 @@ minDuration,
             "Duration Seconds",
             "Cost",
         ];
+
 
         const rows =
             calls.map(
@@ -489,19 +522,23 @@ minDuration,
                 ]
             );
 
+
         const escapeCsvValue = (
             value: string | number
         ) => {
+
             const text =
                 String(
                     value
                 );
+
 
             return `"${text.replace(
                 /"/g,
                 '""'
             )}"`;
         };
+
 
         const csvContent = [
             headers,
@@ -517,6 +554,7 @@ minDuration,
             )
             .join("\n");
 
+
         const blob =
             new Blob(
                 [
@@ -528,33 +566,41 @@ minDuration,
                 }
             );
 
+
         const url =
             URL.createObjectURL(
                 blob
             );
+
 
         const link =
             document.createElement(
                 "a"
             );
 
+
         link.href =
             url;
+
 
         link.download =
             viewMode === "website"
                 ? "website-mobile-leads.csv"
                 : "forwarded-mobile-calls.csv";
 
+
         document.body.appendChild(
             link
         );
 
+
         link.click();
+
 
         document.body.removeChild(
             link
         );
+
 
         URL.revokeObjectURL(
             url
@@ -562,25 +608,35 @@ minDuration,
     }
 
 
+    /* =========================================
+       Export unique numbers
+    ========================================= */
+
     function exportUniqueNumbersToCsv() {
+
         if (
             uniqueNumbers.length === 0
         ) {
             return;
         }
 
+
         const rows = [
+
             [
                 "Caller",
                 "Call Count",
             ],
+
             ...uniqueNumbers.map(
                 (item) => [
                     item.cli,
                     item.call_count,
                 ]
             ),
+
         ];
+
 
         const csvContent =
             rows
@@ -600,6 +656,7 @@ minDuration,
                 )
                 .join("\n");
 
+
         const blob =
             new Blob(
                 [
@@ -611,31 +668,39 @@ minDuration,
                 }
             );
 
+
         const url =
             URL.createObjectURL(
                 blob
             );
+
 
         const link =
             document.createElement(
                 "a"
             );
 
+
         link.href =
             url;
 
+
         link.download =
             "unique-mobile-numbers.csv";
+
 
         document.body.appendChild(
             link
         );
 
+
         link.click();
+
 
         document.body.removeChild(
             link
         );
+
 
         URL.revokeObjectURL(
             url
@@ -648,107 +713,136 @@ minDuration,
     ========================================= */
 
     async function reloadAfterHeaderRefresh() {
+
         try {
+
             setLoading(
                 true
             );
+
 
             setError(
                 null
             );
 
+
             const options =
                 await fetchMobileFilterOptions();
+
 
             setFilterOptions(
                 options
             );
 
+
             /*
-             * Website mode needs a selected
-             * tracking number before calls can load.
+             * Website mode requires
+             * a selected tracking number.
              */
             if (
                 viewMode === "website" &&
                 !selectedCld
             ) {
+
                 setSummary(
                     null
                 );
+
 
                 setCalls(
                     []
                 );
 
+
                 setUniqueNumbers(
                     []
                 );
+
 
                 setTotalCalls(
                     0
                 );
 
+
                 setTotalPages(
                     1
                 );
+
 
                 setPage(
                     1
                 );
 
+
                 return;
             }
 
+
             const summaryData =
                 await fetchMobileSummary({
+
                     startDate:
                         startDate ||
                         undefined,
 
-                    
                     startTime:
                         startTime ||
                         undefined,
 
-endDate:
+                    endDate:
                         endDate ||
                         undefined,
 
-                    
                     endTime:
                         endTime ||
                         undefined,
 
-minDuration,
+                    minDuration,
                     maxDuration,
                     viewMode,
                     selectedCld,
+
                 });
+
 
             setSummary(
                 summaryData
             );
 
+
             setPage(
                 1
             );
 
+
             await loadCalls(
-                1,
-                false
+                1
             );
+
+
+            if (
+                tableView === "unique"
+            ) {
+
+                await loadUniqueNumbers();
+            }
+
         } catch (err) {
+
             console.error(
                 "Failed to reload mobile dashboard:",
                 err
             );
+
 
             setError(
                 err instanceof Error
                     ? err.message
                     : "Failed to reload mobile dashboard"
             );
+
         } finally {
+
             setLoading(
                 false
             );
@@ -798,7 +892,9 @@ minDuration,
 
             selectedCld:
                 null,
+
         });
+
 
         setPage(
             1
@@ -807,18 +903,20 @@ minDuration,
 
 
     /* =========================================
-       Formatting helpers
+       Duration formatting
     ========================================= */
 
     function formatDuration(
         seconds: number | null
     ) {
+
         if (
             seconds === null ||
             seconds === undefined
         ) {
             return "-";
         }
+
 
         const totalSeconds =
             Math.max(
@@ -828,11 +926,13 @@ minDuration,
                 )
             );
 
+
         const hours =
             Math.floor(
                 totalSeconds /
                 3600
             );
+
 
         const minutes =
             Math.floor(
@@ -843,21 +943,26 @@ minDuration,
                 60
             );
 
+
         const remainingSeconds =
             totalSeconds %
             60;
 
+
         if (
             hours > 0
         ) {
+
             return (
                 `${hours}h ${minutes}m`
             );
         }
 
+
         if (
             minutes > 0
         ) {
+
             return (
                 `${minutes}m ${remainingSeconds
                     .toString()
@@ -868,18 +973,25 @@ minDuration,
             );
         }
 
+
         return (
             `${remainingSeconds}s`
         );
     }
 
 
+    /* =========================================
+       Phone formatting
+    ========================================= */
+
     function formatAustralianPhone(
         value: string | null
     ) {
+
         if (!value) {
             return "-";
         }
+
 
         const digits =
             String(
@@ -889,6 +1001,7 @@ minDuration,
                 ""
             );
 
+
         // International mobile
         if (
             digits.startsWith(
@@ -896,6 +1009,7 @@ minDuration,
             ) &&
             digits.length === 11
         ) {
+
             return (
                 `+61 ${digits.slice(
                     2,
@@ -911,6 +1025,7 @@ minDuration,
             );
         }
 
+
         // International landline
         if (
             digits.startsWith(
@@ -918,6 +1033,7 @@ minDuration,
             ) &&
             digits.length === 11
         ) {
+
             return (
                 `+61 ${digits.slice(
                     2,
@@ -933,6 +1049,7 @@ minDuration,
             );
         }
 
+
         // Local mobile
         if (
             digits.startsWith(
@@ -940,6 +1057,7 @@ minDuration,
             ) &&
             digits.length === 10
         ) {
+
             return (
                 `+61 ${digits.slice(
                     1,
@@ -955,6 +1073,7 @@ minDuration,
             );
         }
 
+
         // Local landline
         if (
             digits.startsWith(
@@ -962,6 +1081,7 @@ minDuration,
             ) &&
             digits.length === 10
         ) {
+
             return (
                 `+61 ${digits.slice(
                     1,
@@ -977,6 +1097,7 @@ minDuration,
             );
         }
 
+
         // Mobile missing leading zero
         if (
             digits.startsWith(
@@ -984,6 +1105,7 @@ minDuration,
             ) &&
             digits.length === 9
         ) {
+
             return (
                 `+61 ${digits.slice(
                     0,
@@ -999,6 +1121,7 @@ minDuration,
             );
         }
 
+
         // Landline missing leading zero
         if (
             /^[2378]/.test(
@@ -1006,6 +1129,7 @@ minDuration,
             ) &&
             digits.length === 9
         ) {
+
             return (
                 `+61 ${digits.slice(
                     0,
@@ -1021,17 +1145,24 @@ minDuration,
             );
         }
 
+
         return value;
     }
 
 
+    /* =========================================
+       Connected time formatting
+    ========================================= */
+
     function formatConnectedTime(
         value: string
     ) {
+
         const date =
             new Date(
                 value
             );
+
 
         if (
             Number.isNaN(
@@ -1040,6 +1171,7 @@ minDuration,
         ) {
             return value;
         }
+
 
         return date.toLocaleString(
             "en-AU",
@@ -1066,7 +1198,9 @@ minDuration,
 
     useEffect(
         () => {
+
             loadFilterOptions();
+
         },
         []
     );
@@ -1078,77 +1212,89 @@ minDuration,
 
     useEffect(
         () => {
+
             if (
                 !filterOptions
             ) {
                 return;
             }
 
-            /*
-             * Don't leave forwarded data visible
-             * after switching to website mode.
-             */
+
             if (
                 viewMode === "website" &&
                 !selectedCld
             ) {
+
                 setSummary(
                     null
                 );
+
 
                 setCalls(
                     []
                 );
 
+
                 setTotalCalls(
                     0
                 );
+
 
                 setTotalPages(
                     1
                 );
 
+
                 setPage(
                     1
                 );
+
 
                 setError(
                     null
                 );
 
+
                 setLoading(
                     false
                 );
 
+
                 return;
             }
 
+
             loadSummary();
+
 
             setPage(
                 1
             );
 
+
             loadCalls(
-                1,
-                false
+                1
             );
+
         },
         [
             filterOptions,
+
             startDate,
             startTime,
+
             endDate,
             endTime,
+
             minDuration,
             maxDuration,
+
             viewMode,
             selectedCld,
+
+            pageSize,
         ]
     );
-
-
-
 
 
     /* =========================================
@@ -1157,6 +1303,7 @@ minDuration,
 
     useEffect(
         () => {
+
             if (
                 tableView !== "unique" ||
                 !filterOptions
@@ -1164,28 +1311,37 @@ minDuration,
                 return;
             }
 
+
             if (
                 viewMode === "website" &&
                 !selectedCld
             ) {
+
                 setUniqueNumbers(
                     []
                 );
 
+
                 return;
             }
 
+
             loadUniqueNumbers();
+
         },
         [
             tableView,
             filterOptions,
+
             startDate,
             startTime,
+
             endDate,
             endTime,
+
             minDuration,
             maxDuration,
+
             viewMode,
             selectedCld,
         ]
@@ -1198,6 +1354,7 @@ minDuration,
 
     useEffect(
         () => {
+
             if (
                 refreshKey === 0 ||
                 !filterOptions
@@ -1205,7 +1362,9 @@ minDuration,
                 return;
             }
 
+
             reloadAfterHeaderRefresh();
+
         },
         [
             refreshKey,
@@ -1222,11 +1381,15 @@ minDuration,
         !summary &&
         viewMode === "forwarded"
     ) {
+
         return (
+
             <div className="mobile-dashboard-page">
+
                 <p className="mobile-dashboard-message">
                     Loading mobile dashboard...
                 </p>
+
             </div>
         );
     }
@@ -1240,7 +1403,9 @@ minDuration,
         error &&
         !summary
     ) {
+
         return (
+
             <div className="mobile-dashboard-page">
 
                 <div className="mobile-dashboard-error">
@@ -1280,13 +1445,16 @@ minDuration,
     ========================================= */
 
     return (
+
         <div className="mobile-dashboard-page">
+
 
             {/* =================================
                 Mobile sub-tabs
             ================================= */}
 
             <div className="mobile-subtabs">
+
 
                 <button
                     type="button"
@@ -1302,13 +1470,16 @@ minDuration,
                     }
 
                     onClick={() => {
+
                         if (
                             viewMode === "forwarded"
                         ) {
                             return;
                         }
 
+
                         onFiltersChange({
+
                             ...filters,
 
                             viewMode:
@@ -1316,7 +1487,9 @@ minDuration,
 
                             selectedCld:
                                 null,
+
                         });
+
                     }}
                 >
                     Forwarded Number
@@ -1337,40 +1510,43 @@ minDuration,
                     }
 
                     onClick={() => {
+
                         if (
                             viewMode === "website"
                         ) {
                             return;
                         }
 
+
                         onFiltersChange({
+
                             ...filters,
 
                             viewMode:
                                 "website",
 
-                            /*
-                             * Start the website view with
-                             * an explicit selection.
-                             */
                             selectedCld:
                                 null,
+
                         });
+
                     }}
                 >
                     Website / Tracking Number
                 </button>
 
+
             </div>
 
 
             {/* =================================
-                Website-specific selector
+                Website selector
             ================================= */}
 
             {
                 viewMode === "website" &&
                 (
+
                     <div className="mobile-website-selector-card">
 
                         <div className="mobile-filter-group mobile-tracking-number-filter">
@@ -1378,6 +1554,7 @@ minDuration,
                             <label>
                                 Website / Tracking Number
                             </label>
+
 
                             <select
                                 className="mobile-filter-input"
@@ -1390,23 +1567,30 @@ minDuration,
                                 onChange={(
                                     event
                                 ) => {
+
                                     const value =
                                         event
                                             .target
                                             .value;
 
+
                                     onFiltersChange({
+
                                         ...filters,
 
                                         selectedCld:
                                             value ||
                                             null,
+
                                     });
+
                                 }}
                             >
+
                                 <option value="">
                                     Select website
                                 </option>
+
 
                                 {
                                     (
@@ -1415,6 +1599,7 @@ minDuration,
                                         ?? []
                                     ).map(
                                         (item) => (
+
                                             <option
                                                 key={
                                                     item.cld
@@ -1444,15 +1629,26 @@ minDuration,
 
 
             {/* =================================
-                Filters for active sub-tab
+                Active filters
             ================================= */}
 
             <MobileDashboardFilters
-                startDate={startDate}
-                startTime={startTime}
 
-                endDate={endDate}
-                endTime={endTime}
+                startDate={
+                    startDate
+                }
+
+                startTime={
+                    startTime
+                }
+
+                endDate={
+                    endDate
+                }
+
+                endTime={
+                    endTime
+                }
 
                 minDate={
                     filterOptions
@@ -1475,13 +1671,17 @@ minDuration,
                 maxDuration={
                     maxDuration
                 }
+
+
                 onDateTimeRangeChange={(
                     newStartDate,
                     newStartTime,
                     newEndDate,
                     newEndTime,
                 ) =>
+
                     onFiltersChange({
+
                         ...filters,
 
                         startDate:
@@ -1495,26 +1695,45 @@ minDuration,
 
                         endTime:
                             newEndTime,
+
                     })
                 }
 
-                onMinDurationChange={(value) =>
+
+                onMinDurationChange={(
+                    value
+                ) =>
+
                     onFiltersChange({
+
                         ...filters,
-                        minDuration: value,
+
+                        minDuration:
+                            value,
+
                     })
                 }
 
-                onMaxDurationChange={(value) =>
+
+                onMaxDurationChange={(
+                    value
+                ) =>
+
                     onFiltersChange({
+
                         ...filters,
-                        maxDuration: value,
+
+                        maxDuration:
+                            value,
+
                     })
                 }
+
 
                 onClearFilters={
                     clearFilters
                 }
+
             />
 
 
@@ -1526,6 +1745,7 @@ minDuration,
                 viewMode === "website" &&
                 !selectedCld &&
                 (
+
                     <div className="mobile-view-empty-state">
 
                         <h3>
@@ -1542,16 +1762,18 @@ minDuration,
 
 
             {/* =================================
-                Dashboard state
+                Updating state
             ================================= */}
 
             {
                 loading &&
                 summary &&
                 (
+
                     <p className="mobile-dashboard-updating">
                         Updating dashboard...
                     </p>
+
                 )
             }
 
@@ -1560,9 +1782,11 @@ minDuration,
                 error &&
                 summary &&
                 (
+
                     <p className="mobile-dashboard-inline-error">
                         {error}
                     </p>
+
                 )
             }
 
@@ -1574,7 +1798,9 @@ minDuration,
             {
                 summary &&
                 (
+
                     <div className="mobile-metric-grid">
+
 
                         <MetricCard
                             title="Calls"
@@ -1603,7 +1829,7 @@ minDuration,
                                     summary.unique_cli
 
                                     ? `${summary.total_calls -
-                                    summary.unique_cli
+                                        summary.unique_cli
                                     } called more than once`
 
                                     : "No repeat callers"
@@ -1631,6 +1857,7 @@ minDuration,
                                                 .total_calls
                                         )
                                     )} per call`
+
                                     : "No call duration"
                             }
                         />
@@ -1657,6 +1884,7 @@ minDuration,
                                     ).toFixed(
                                         2
                                     )} per call`
+
                                     : "No call cost"
                             }
                         />
@@ -1686,13 +1914,14 @@ minDuration,
                             }
                         />
 
+
                     </div>
                 )
             }
 
 
             {/* =================================
-                Data view
+                Data view tabs
             ================================= */}
 
             {
@@ -1701,7 +1930,9 @@ minDuration,
                     selectedCld
                 ) &&
                 (
+
                     <div className="mobile-subtabs">
+
 
                         <button
                             type="button"
@@ -1740,6 +1971,7 @@ minDuration,
                             Unique Numbers
                         </button>
 
+
                     </div>
                 )
             }
@@ -1756,9 +1988,12 @@ minDuration,
                     selectedCld
                 ) &&
                 (
+
                     <div className="mobile-table-card">
 
+
                         <div className="mobile-table-header">
+
 
                             <div>
 
@@ -1769,6 +2004,7 @@ minDuration,
                                             : "Website Leads"
                                     }
                                 </h2>
+
 
                                 <p className="mobile-table-subtitle">
                                     {
@@ -1785,10 +2021,13 @@ minDuration,
 
                             <button
                                 type="button"
+
                                 className="mobile-export-button"
+
                                 onClick={
                                     exportMobileCallsToCsv
                                 }
+
                                 disabled={
                                     calls.length === 0
                                 }
@@ -1796,26 +2035,27 @@ minDuration,
                                 ↓&nbsp;&nbsp;Export CSV
                             </button>
 
+
                         </div>
 
 
                         {
                             tableLoading &&
                             (
+
                                 <div className="mobile-table-loading">
-                                    {
-                                        calls.length > 0
-                                            ? "Loading more calls..."
-                                            : "Loading calls..."
-                                    }
+                                    Loading calls...
                                 </div>
+
                             )
                         }
 
 
                         <div className="mobile-table-scroll">
 
+
                             <table className="mobile-table">
+
 
                                 <thead>
 
@@ -1849,15 +2089,18 @@ minDuration,
 
                                 <tbody>
 
+
                                     {
                                         calls.length === 0
                                             ? (
+
                                                 <tr>
 
                                                     <td
                                                         colSpan={
                                                             5
                                                         }
+
                                                         className="mobile-table-empty"
                                                     >
                                                         {
@@ -1868,16 +2111,20 @@ minDuration,
                                                     </td>
 
                                                 </tr>
+
                                             )
                                             : (
+
                                                 calls.map(
                                                     (
                                                         call
                                                     ) => {
+
                                                         const duration =
                                                             call
                                                                 .billed_duration
                                                             ?? 0;
+
 
                                                         const durationWidth =
                                                             Math.max(
@@ -1889,39 +2136,49 @@ minDuration,
                                                                 3
                                                             );
 
+
                                                         return (
+
                                                             <tr
                                                                 key={
                                                                     call.id
                                                                 }
                                                             >
 
+
                                                                 <td className="mobile-connected-cell">
+
                                                                     {
                                                                         formatConnectedTime(
                                                                             call.connect_time
                                                                         )
                                                                     }
+
                                                                 </td>
 
 
                                                                 <td className="mobile-caller-cell">
+
                                                                     {
                                                                         formatAustralianPhone(
                                                                             call.cli
                                                                         )
                                                                     }
+
                                                                 </td>
 
 
                                                                 <td>
 
+
                                                                     <div className="mobile-duration-cell">
+
 
                                                                         <div className="mobile-duration-track">
 
                                                                             <div
                                                                                 className="mobile-duration-bar"
+
                                                                                 style={{
                                                                                     width:
                                                                                         `${durationWidth}%`,
@@ -1932,19 +2189,24 @@ minDuration,
 
 
                                                                         <span className="mobile-duration-value">
+
                                                                             {
                                                                                 formatDuration(
                                                                                     call.billed_duration
                                                                                 )
                                                                             }
+
                                                                         </span>
 
+
                                                                     </div>
+
 
                                                                 </td>
 
 
                                                                 <td className="mobile-cost-cell">
+
                                                                     {
                                                                         call.cost !== null
                                                                             ? `$${call.cost.toFixed(
@@ -1952,6 +2214,7 @@ minDuration,
                                                                             )}`
                                                                             : "-"
                                                                     }
+
                                                                 </td>
 
 
@@ -1959,82 +2222,240 @@ minDuration,
                                                                     ›
                                                                 </td>
 
+
                                                             </tr>
+
                                                         );
                                                     }
                                                 )
+
                                             )
                                     }
 
+
                                 </tbody>
 
+
                             </table>
+
 
                         </div>
 
 
                         {/* =================================
-                            Cumulative pagination
+                            Pagination
                         ================================= */}
 
                         <div className="mobile-pagination">
 
+
                             <span className="mobile-pagination-summary">
-                                Showing{" "}
+
                                 {
-                                    calls.length
+                                    totalCalls === 0
+                                        ? "Showing 0 calls"
+                                        : (
+                                            <>
+
+                                                Showing{" "}
+
+                                                {
+                                                    (
+                                                        page -
+                                                        1
+                                                    ) *
+                                                    pageSize +
+                                                    1
+                                                }
+
+                                                {"–"}
+
+                                                {
+                                                    Math.min(
+                                                        page *
+                                                        pageSize,
+                                                        totalCalls
+                                                    )
+                                                }
+
+                                                {" "}of{" "}
+
+                                                {
+                                                    totalCalls
+                                                }
+
+                                                {" "}calls
+
+                                            </>
+                                        )
                                 }
-                                {" "}of{" "}
-                                {
-                                    totalCalls
-                                }
-                                {" "}calls
+
                             </span>
 
 
-                            {
-                                page < totalPages
-                                    ? (
-                                        <div className="mobile-pagination-actions">
+                            <div className="mobile-pagination-controls">
 
-                                            <button
-                                                type="button"
-                                                disabled={
-                                                    tableLoading
-                                                }
-                                                onClick={() => {
-                                                    if (
-                                                        tableLoading
-                                                    ) {
-                                                        return;
-                                                    }
 
-                                                    loadCalls(
-                                                        page + 1,
-                                                        true
-                                                    );
-                                                }}
-                                            >
-                                                {
-                                                    tableLoading
-                                                        ? "Loading..."
-                                                        : "Load more"
-                                                }
-                                            </button>
+                                <label className="pagination-page-size">
 
-                                        </div>
-                                    )
-                                    : (
-                                        totalCalls > 0 &&
-                                        (
-                                            <span className="mobile-pagination-summary">
-                                                All calls loaded
-                                            </span>
-                                        )
-                                    )
-                            }
+
+                                    <span>
+                                        Rows per page
+                                    </span>
+
+
+                                    <select
+                                        value={
+                                            pageSize
+                                        }
+
+                                        disabled={
+                                            tableLoading
+                                        }
+
+                                        onChange={(
+                                            event
+                                        ) => {
+
+                                            const newPageSize =
+                                                Number(
+                                                    event
+                                                        .target
+                                                        .value
+                                                );
+
+
+                                            setPage(
+                                                1
+                                            );
+
+
+                                            setPageSize(
+                                                newPageSize
+                                            );
+
+                                        }}
+                                    >
+
+                                        {
+                                            [
+                                                25,
+                                                50,
+                                                100,
+                                                150,
+                                                200,
+                                            ].map(
+                                                (
+                                                    size
+                                                ) => (
+
+                                                    <option
+                                                        key={
+                                                            size
+                                                        }
+
+                                                        value={
+                                                            size
+                                                        }
+                                                    >
+                                                        {size}
+                                                    </option>
+
+                                                )
+                                            )
+                                        }
+
+                                    </select>
+
+
+                                </label>
+
+
+                                <button
+                                    type="button"
+
+                                    disabled={
+                                        tableLoading ||
+                                        page <= 1
+                                    }
+
+                                    onClick={() => {
+
+                                        if (
+                                            tableLoading ||
+                                            page <= 1
+                                        ) {
+                                            return;
+                                        }
+
+
+                                        loadCalls(
+                                            page - 1
+                                        );
+
+                                    }}
+                                >
+                                    Previous
+                                </button>
+
+
+                                <span className="mobile-pagination-page">
+
+                                    Page{" "}
+
+                                    {
+                                        totalCalls > 0
+                                            ? page
+                                            : 0
+                                    }
+
+                                    {" "}of{" "}
+
+                                    {
+                                        totalCalls > 0
+                                            ? totalPages
+                                            : 0
+                                    }
+
+                                </span>
+
+
+                                <button
+                                    type="button"
+
+                                    disabled={
+                                        tableLoading ||
+                                        page >=
+                                        totalPages ||
+                                        totalCalls === 0
+                                    }
+
+                                    onClick={() => {
+
+                                        if (
+                                            tableLoading ||
+                                            page >=
+                                            totalPages
+                                        ) {
+                                            return;
+                                        }
+
+
+                                        loadCalls(
+                                            page + 1
+                                        );
+
+                                    }}
+                                >
+                                    Next
+                                </button>
+
+
+                            </div>
+
 
                         </div>
+
 
                     </div>
                 )
@@ -2052,9 +2473,12 @@ minDuration,
                     selectedCld
                 ) &&
                 (
+
                     <div className="mobile-table-card">
 
+
                         <div className="mobile-table-header">
+
 
                             <div>
 
@@ -2062,8 +2486,9 @@ minDuration,
                                     Unique Numbers
                                 </h2>
 
+
                                 <p className="mobile-table-subtitle">
-                                    Unique caller numbers for the selected filters and time range.
+                                    Unique callers matching the selected filters.
                                 </p>
 
                             </div>
@@ -2071,10 +2496,13 @@ minDuration,
 
                             <button
                                 type="button"
+
                                 className="mobile-export-button"
+
                                 onClick={
                                     exportUniqueNumbersToCsv
                                 }
+
                                 disabled={
                                     uniqueNumbers.length === 0
                                 }
@@ -2082,22 +2510,27 @@ minDuration,
                                 ↓&nbsp;&nbsp;Export CSV
                             </button>
 
+
                         </div>
 
 
                         {
                             uniqueNumbersLoading &&
                             (
+
                                 <div className="mobile-table-loading">
                                     Loading unique numbers...
                                 </div>
+
                             )
                         }
 
 
                         <div className="mobile-table-scroll">
 
+
                             <table className="mobile-table">
+
 
                                 <thead>
 
@@ -2118,15 +2551,18 @@ minDuration,
 
                                 <tbody>
 
+
                                     {
                                         uniqueNumbers.length === 0
                                             ? (
+
                                                 <tr>
 
                                                     <td
                                                         colSpan={
                                                             2
                                                         }
+
                                                         className="mobile-table-empty"
                                                     >
                                                         {
@@ -2137,10 +2573,15 @@ minDuration,
                                                     </td>
 
                                                 </tr>
+
                                             )
                                             : (
+
                                                 uniqueNumbers.map(
-                                                    (item) => (
+                                                    (
+                                                        item
+                                                    ) => (
+
                                                         <tr
                                                             key={
                                                                 item.cli
@@ -2148,12 +2589,15 @@ minDuration,
                                                         >
 
                                                             <td className="mobile-caller-cell">
+
                                                                 {
                                                                     formatAustralianPhone(
                                                                         item.cli
                                                                     )
                                                                 }
+
                                                             </td>
+
 
                                                             <td>
                                                                 {
@@ -2162,14 +2606,19 @@ minDuration,
                                                             </td>
 
                                                         </tr>
+
                                                     )
                                                 )
+
                                             )
                                     }
 
+
                                 </tbody>
 
+
                             </table>
+
 
                         </div>
 
@@ -2177,17 +2626,22 @@ minDuration,
                         <div className="mobile-pagination">
 
                             <span className="mobile-pagination-summary">
+
                                 {
                                     uniqueNumbers.length
                                 }
+
                                 {" "}unique numbers
+
                             </span>
 
                         </div>
 
+
                     </div>
                 )
             }
+
 
         </div>
     );

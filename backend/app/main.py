@@ -26,6 +26,11 @@ from app.api.message import (
     router as message_router,
 )
 
+from app.api.admin import (
+    router as admin_router,
+)
+
+
 
 app = FastAPI()
 
@@ -71,4 +76,8 @@ app.include_router(
 )
 app.include_router(
     message_router
+)
+
+app.include_router(
+    admin_router
 )

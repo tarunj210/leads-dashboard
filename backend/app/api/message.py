@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from fastapi import (
     APIRouter,
     HTTPException,
@@ -8,6 +6,10 @@ from fastapi import (
 
 from app.services.message_service import (
     get_lead_message,
+)
+
+from app.api.date_time_utils import (
+    build_datetime_range,
 )
 
 
@@ -19,26 +21,40 @@ router = APIRouter(
 
 @router.get("/leads")
 def lead_message(
-    start_date: datetime = Query(
+
+    start_date: str = Query(
         ...
     ),
-    end_date: datetime = Query(
+
+    start_time: str = Query(
+        "00:00"
+    ),
+
+    end_date: str = Query(
         ...
+    ),
+
+    end_time: str = Query(
+        "23:59"
     ),
 ):
 
     try:
 
-        if end_date < start_date:
-
-            raise ValueError(
-                "end_date must be after start_date"
-            )
+        (
+            start_datetime,
+            end_datetime,
+        ) = build_datetime_range(
+            start_date=start_date,
+            start_time=start_time,
+            end_date=end_date,
+            end_time=end_time,
+        )
 
 
         return get_lead_message(
-            start_date=start_date,
-            end_date=end_date,
+            start_date=start_datetime,
+            end_date=end_datetime,
         )
 
 

@@ -7,7 +7,10 @@ import type {
 
 export interface LeadTableFilters {
     startDate?: string;
+    startTime?: string;
+
     endDate?: string;
+    endTime?: string;
 
     service?: string;
     domain?: string;
@@ -35,10 +38,26 @@ export async function getFilteredLeads(
     }
 
 
+    if (filters.startTime) {
+        params.set(
+            "start_time",
+            filters.startTime
+        );
+    }
+
+
     if (filters.endDate) {
         params.set(
             "end_date",
             filters.endDate
+        );
+    }
+
+
+    if (filters.endTime) {
+        params.set(
+            "end_time",
+            filters.endTime
         );
     }
 

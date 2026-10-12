@@ -1,9 +1,16 @@
 import { API_BASE_URL } from "./config";
-import type { DashboardData } from "../types/dashboard";
+import type {
+    DashboardData,
+} from "../types/dashboard";
+
 
 export interface DashboardFilters {
     startDate?: string;
+    startTime?: string;
+
     endDate?: string;
+    endTime?: string;
+
     service?: string;
     domain?: string;
     pageName?: string;
@@ -16,99 +23,132 @@ export interface UniqueEmailItem {
     lead_count: number;
 }
 
+
 export interface UniqueEmailsResponse {
     total: number;
     items: UniqueEmailItem[];
 }
 
-export async function getDashboardData(
-    filters: DashboardFilters = {}
-): Promise<DashboardData> {
-    const params = new URLSearchParams();
+
+function buildDashboardParams(
+    filters: DashboardFilters
+): URLSearchParams {
+
+    const params =
+        new URLSearchParams();
+
 
     if (filters.startDate) {
-        params.set("start_date", filters.startDate);
+        params.set(
+            "start_date",
+            filters.startDate
+        );
     }
 
-    if (filters.endDate) {
-        params.set("end_date", filters.endDate);
+
+    if (filters.startTime) {
+        params.set(
+            "start_time",
+            filters.startTime
+        );
     }
+
+
+    if (filters.endDate) {
+        params.set(
+            "end_date",
+            filters.endDate
+        );
+    }
+
+
+    if (filters.endTime) {
+        params.set(
+            "end_time",
+            filters.endTime
+        );
+    }
+
 
     params.set(
         "service",
         filters.service ?? "all"
     );
 
+
     params.set(
         "domain",
         filters.domain ?? "all"
     );
+
 
     params.set(
         "page_name",
         filters.pageName ?? "all"
     );
 
+
     params.set(
         "status",
         filters.status ?? "all"
     );
 
-    const response = await fetch(
-        `${API_BASE_URL}/api/dashboard/data?${params.toString()}`
-    );
+
+    return params;
+}
+
+
+export async function getDashboardData(
+    filters: DashboardFilters = {}
+): Promise<DashboardData> {
+
+    const params =
+        buildDashboardParams(
+            filters
+        );
+
+
+    const response =
+        await fetch(
+            `${API_BASE_URL}/api/dashboard/data?${params.toString()}`
+        );
+
 
     if (!response.ok) {
+
         throw new Error(
             `Failed to load dashboard data: ${response.status}`
         );
     }
 
+
     return response.json();
 }
+
 
 export async function getUniqueEmails(
     filters: DashboardFilters = {}
 ): Promise<UniqueEmailsResponse> {
-    const params = new URLSearchParams();
 
-    if (filters.startDate) {
-        params.set("start_date", filters.startDate);
-    }
+    const params =
+        buildDashboardParams(
+            filters
+        );
 
-    if (filters.endDate) {
-        params.set("end_date", filters.endDate);
-    }
 
-    params.set(
-        "service",
-        filters.service ?? "all"
-    );
+    const response =
+        await fetch(
+            `${API_BASE_URL}/api/dashboard/unique-emails?${params.toString()}`
+        );
 
-    params.set(
-        "domain",
-        filters.domain ?? "all"
-    );
-
-    params.set(
-        "page_name",
-        filters.pageName ?? "all"
-    );
-
-    params.set(
-        "status",
-        filters.status ?? "all"
-    );
-
-    const response = await fetch(
-        `${API_BASE_URL}/api/dashboard/unique-emails?${params.toString()}`
-    );
 
     if (!response.ok) {
+
         throw new Error(
             `Failed to load unique emails: ${response.status}`
         );
     }
+
 
     return response.json();
 }

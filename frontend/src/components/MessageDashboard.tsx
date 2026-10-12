@@ -26,36 +26,65 @@ type MessageDashboardProps = {
 };
 
 
-function pad(
-    value: number,
-) {
-    return String(
-        value
-    ).padStart(
-        2,
-        "0"
-    );
+function normalizeDate(
+    value: string
+): string {
+
+    if (!value) {
+        return "";
+    }
+
+    return value
+        .split("T")[0]
+        .split(" ")[0];
 }
 
 
-function getTodayDate(): string {
-    const now =
-        new Date();
+function toDateTimeLocalValue(
+    date: string,
+    time: string,
+): string {
 
-    const year =
-        now.getFullYear();
-
-    const month =
-        pad(
-            now.getMonth() + 1
+    const normalizedDate =
+        normalizeDate(
+            date
         );
 
-    const day =
-        pad(
-            now.getDate()
-        );
+    if (!normalizedDate) {
+        return "";
+    }
 
-    return `${year}-${month}-${day}`;
+    return `${normalizedDate}T${time || "00:00"}`;
+}
+
+
+function splitDateTimeLocalValue(
+    value: string,
+): {
+    date: string;
+    time: string;
+} {
+
+    if (!value) {
+        return {
+            date: "",
+            time: "",
+        };
+    }
+
+    const [
+        date,
+        time = "",
+    ] = value.split("T");
+
+    return {
+        date,
+        time:
+            time.slice(
+                0,
+                5
+            ),
+    };
 }
 
 
@@ -101,81 +130,23 @@ export default function MessageDashboard({
     );
 
 
-    /*
-     * Initialise missing values only.
-     *
-     * This also migrates older localStorage values
-     * that only contained startDate/endDate.
-     */
-    useEffect(
-        () => {
-
-            const today =
-                getTodayDate();
-
-
-            if (
-                !filters.startDate ||
-                !filters.endDate ||
-                !filters.startTime ||
-                !filters.endTime
-            ) {
-
-                onFiltersChange({
-                    ...filters,
-
-                    startDate:
-                        filters.startDate ||
-                        today,
-
-                    startTime:
-                        filters.startTime ||
-                        "00:00",
-
-                    endDate:
-                        filters.endDate ||
-                        today,
-
-                    endTime:
-                        filters.endTime ||
-                        "23:59",
-                });
-            }
-
-        },
-        []
-    );
-
-
     async function loadMessage() {
 
-        if (
-            !startDate ||
-            !endDate
-        ) {
-            setError(
-                "Select both a start and end date."
+        const normalizedStartDate =
+            normalizeDate(
+                startDate
             );
 
-            return;
-        }
-
-
-        const startDateTime =
-            `${startDate}T${startTime}:00`;
-
-        const endDateTime =
-            `${endDate}T${endTime}:59`;
+        const normalizedEndDate =
+            normalizeDate(
+                endDate
+            );
 
 
         if (
-            endDateTime <
-            startDateTime
+            !normalizedStartDate ||
+            !normalizedEndDate
         ) {
-            setError(
-                "End date and time must be after the start date and time."
-            );
-
             return;
         }
 
@@ -193,10 +164,10 @@ export default function MessageDashboard({
 
             const result =
                 await fetchLeadMessage(
-                    startDate,
-                    startTime,
-                    endDate,
-                    endTime,
+                    normalizedStartDate,
+                    startTime || "00:00",
+                    normalizedEndDate,
+                    endTime || "23:59",
                 );
 
 
@@ -207,6 +178,7 @@ export default function MessageDashboard({
         } catch (err) {
 
             console.error(
+                "Failed to load lead message:",
                 err
             );
 
@@ -222,39 +194,7 @@ export default function MessageDashboard({
             setLoading(
                 false
             );
-
         }
-    }
-
-
-    function clearFilters() {
-
-        const today =
-            getTodayDate();
-
-
-        onFiltersChange({
-            startDate:
-                today,
-
-            startTime:
-                "00:00",
-
-            endDate:
-                today,
-
-            endTime:
-                "23:59",
-        });
-
-
-        setData(
-            null
-        );
-
-        setError(
-            null
-        );
     }
 
 
@@ -289,11 +229,17 @@ export default function MessageDashboard({
             );
 
 
+        const date =
+            normalizeDate(
+                startDate
+            );
+
+
         anchor.href =
             url;
 
         anchor.download =
-            `leads-${startDate}.txt`;
+            `leads-${date}.txt`;
 
 
         document.body.appendChild(
@@ -302,7 +248,6 @@ export default function MessageDashboard({
 
 
         anchor.click();
-
 
         anchor.remove();
 
@@ -313,16 +258,48 @@ export default function MessageDashboard({
     }
 
 
+    /*
+     * Reload automatically whenever the
+     * selected date/time range changes.
+     */
     useEffect(
         () => {
 
             if (
-                refreshKey > 0 &&
-                startDate &&
-                endDate
+                !startDate ||
+                !endDate
             ) {
-                loadMessage();
+                return;
             }
+
+            loadMessage();
+
+        },
+        [
+            startDate,
+            startTime,
+            endDate,
+            endTime,
+        ]
+    );
+
+
+    /*
+     * Header refresh should regenerate
+     * the currently selected range.
+     */
+    useEffect(
+        () => {
+
+            if (
+                refreshKey === 0 ||
+                !startDate ||
+                !endDate
+            ) {
+                return;
+            }
+
+            loadMessage();
 
         },
         [
@@ -360,55 +337,42 @@ export default function MessageDashboard({
                 <div className="message-filter">
 
                     <label>
-                        Start date
+                        Start date & time
                     </label>
 
                     <input
-                        type="date"
+                        type="datetime-local"
 
                         value={
-                            startDate
+                            toDateTimeLocalValue(
+                                startDate,
+                                startTime || "00:00",
+                            )
                         }
 
                         onChange={(
                             event
                         ) => {
 
+                            const {
+                                date,
+                                time,
+                            } =
+                                splitDateTimeLocalValue(
+                                    event.target.value
+                                );
+
+
                             onFiltersChange({
+
                                 ...filters,
 
                                 startDate:
-                                    event.target.value,
-                            });
-
-                        }}
-                    />
-
-                </div>
-
-
-                <div className="message-filter">
-
-                    <label>
-                        Start time
-                    </label>
-
-                    <input
-                        type="time"
-
-                        value={
-                            startTime
-                        }
-
-                        onChange={(
-                            event
-                        ) => {
-
-                            onFiltersChange({
-                                ...filters,
+                                    date,
 
                                 startTime:
-                                    event.target.value,
+                                    time || "00:00",
+
                             });
 
                         }}
@@ -420,55 +384,42 @@ export default function MessageDashboard({
                 <div className="message-filter">
 
                     <label>
-                        End date
+                        End date & time
                     </label>
 
                     <input
-                        type="date"
+                        type="datetime-local"
 
                         value={
-                            endDate
+                            toDateTimeLocalValue(
+                                endDate,
+                                endTime || "23:59",
+                            )
                         }
 
                         onChange={(
                             event
                         ) => {
 
+                            const {
+                                date,
+                                time,
+                            } =
+                                splitDateTimeLocalValue(
+                                    event.target.value
+                                );
+
+
                             onFiltersChange({
+
                                 ...filters,
 
                                 endDate:
-                                    event.target.value,
-                            });
-
-                        }}
-                    />
-
-                </div>
-
-
-                <div className="message-filter">
-
-                    <label>
-                        End time
-                    </label>
-
-                    <input
-                        type="time"
-
-                        value={
-                            endTime
-                        }
-
-                        onChange={(
-                            event
-                        ) => {
-
-                            onFiltersChange({
-                                ...filters,
+                                    date,
 
                                 endTime:
-                                    event.target.value,
+                                    time || "23:59",
+
                             });
 
                         }}
@@ -479,14 +430,18 @@ export default function MessageDashboard({
 
                 <button
                     type="button"
-                    className="message-generate-button"
+
+                    className=
+                        "message-generate-button"
 
                     onClick={
                         loadMessage
                     }
 
                     disabled={
-                        loading
+                        loading ||
+                        !startDate ||
+                        !endDate
                     }
                 >
 
@@ -496,22 +451,6 @@ export default function MessageDashboard({
                             : "Generate"
                     }
 
-                </button>
-
-
-                <button
-                    type="button"
-                    className="message-clear-button"
-
-                    onClick={
-                        clearFilters
-                    }
-
-                    disabled={
-                        loading
-                    }
-                >
-                    Clear
                 </button>
 
             </div>
@@ -534,6 +473,7 @@ export default function MessageDashboard({
 
                         <div className="message-summary">
 
+
                             <div>
 
                                 <span>
@@ -542,7 +482,8 @@ export default function MessageDashboard({
 
                                 <strong>
                                     {
-                                        data.call_lead_count
+                                        data
+                                            .call_lead_count
                                     }
                                 </strong>
 
@@ -557,16 +498,20 @@ export default function MessageDashboard({
 
                                 <strong>
                                     {
-                                        data.email_lead_count
+                                        data
+                                            .email_lead_count
                                     }
                                 </strong>
 
                             </div>
 
+
                         </div>
 
 
-                        <div className="message-preview-header">
+                        <div className=
+                            "message-preview-header"
+                        >
 
                             <h2>
                                 Message Preview
@@ -575,7 +520,9 @@ export default function MessageDashboard({
 
                             <button
                                 type="button"
-                                className="message-download-button"
+
+                                className=
+                                    "message-download-button"
 
                                 onClick={
                                     downloadMessage
@@ -596,7 +543,6 @@ export default function MessageDashboard({
                     </>
                 )
             }
-
 
         </div>
     );

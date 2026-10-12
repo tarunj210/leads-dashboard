@@ -136,15 +136,19 @@ export default function MessageDashboard({
             ) {
         
                 onFiltersChange({
-        
                     startDate:
-                        filters.startDate ||
-                        defaultRange.start,
-        
+                        filters.startDate,
+                
+                    startTime:
+                        filters.startTime ||
+                        "00:00",
+                
                     endDate:
-                        filters.endDate ||
-                        defaultRange.end,
-        
+                        filters.endDate,
+                
+                    endTime:
+                        filters.endTime ||
+                        "23:59",
                 });
         
             }

@@ -717,46 +717,46 @@ export default function MobileDashboard({
     ========================================= */
 
     function clearFilters() {
+
         onFiltersChange({
+    
             startDate:
                 filterOptions
                     ?.date_range
                     .min_date
                 ?? "",
-
+    
+            startTime:
+                "00:00",
+    
             endDate:
                 filterOptions
                     ?.date_range
                     .max_date
                 ?? "",
-
+    
+            endTime:
+                "23:59",
+    
             minDuration:
                 filterOptions
                     ?.duration
                     .default_min
                 ?? 60,
-
+    
             maxDuration:
                 filterOptions
                     ?.duration
                     .default_max
                 ?? null,
-
-            /*
-             * Stay in the current sub-tab.
-             * Clearing filters should not unexpectedly
-             * move the user to another view.
-             */
+    
             viewMode,
-
-            /*
-             * In website mode, clear the website selection.
-             * Forwarded mode never needs selectedCld.
-             */
+    
             selectedCld:
                 null,
         });
-
+    
+    
         setPage(
             1
         );

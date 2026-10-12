@@ -247,8 +247,16 @@ export default function MobileDashboard({
                         startDate ||
                         undefined,
 
+                    startTime:
+                        startTime ||
+                        undefined,
+
                     endDate:
                         endDate ||
+                        undefined,
+
+                    endTime:
+                        endTime ||
                         undefined,
 
                     minDuration,
@@ -302,8 +310,16 @@ export default function MobileDashboard({
                         startDate ||
                         undefined,
 
+                    startTime:
+                        startTime ||
+                        undefined,
+
                     endDate:
                         endDate ||
+                        undefined,
+
+                    endTime:
+                        endTime ||
                         undefined,
 
                     minDuration,
@@ -397,8 +413,16 @@ export default function MobileDashboard({
                         startDate ||
                         undefined,
 
+                    startTime:
+                        startTime ||
+                        undefined,
+
                     endDate:
                         endDate ||
+                        undefined,
+
+                    endTime:
+                        endTime ||
                         undefined,
 
                     minDuration,
@@ -675,8 +699,16 @@ export default function MobileDashboard({
                         startDate ||
                         undefined,
 
+                    startTime:
+                        startTime ||
+                        undefined,
+
                     endDate:
                         endDate ||
+                        undefined,
+
+                    endTime:
+                        endTime ||
                         undefined,
 
                     minDuration,
@@ -1038,57 +1070,35 @@ export default function MobileDashboard({
 
     useEffect(
         () => {
+    
             if (
                 !filterOptions
             ) {
                 return;
             }
-
-            /*
-             * Don't leave forwarded data visible
-             * after switching to website mode.
-             */
+    
             if (
                 viewMode === "website" &&
                 !selectedCld
             ) {
-                setSummary(
-                    null
-                );
-
-                setCalls(
-                    []
-                );
-
-                setTotalCalls(
-                    0
-                );
-
-                setTotalPages(
-                    1
-                );
-
-                setPage(
-                    1
-                );
-
-                setError(
-                    null
-                );
-
-                setLoading(
-                    false
-                );
-
+    
+                setSummary(null);
+                setCalls([]);
+                setTotalCalls(0);
+                setTotalPages(1);
+                setPage(1);
+                setError(null);
+                setLoading(false);
+    
                 return;
             }
-
+    
             loadSummary();
-
+    
             setPage(
                 1
             );
-
+    
             loadCalls(
                 1,
                 false
@@ -1097,7 +1107,9 @@ export default function MobileDashboard({
         [
             filterOptions,
             startDate,
+            startTime,
             endDate,
+            endTime,
             minDuration,
             maxDuration,
             viewMode,
@@ -1115,31 +1127,35 @@ export default function MobileDashboard({
 
     useEffect(
         () => {
+    
             if (
                 tableView !== "unique" ||
                 !filterOptions
             ) {
                 return;
             }
-
+    
             if (
                 viewMode === "website" &&
                 !selectedCld
             ) {
+    
                 setUniqueNumbers(
                     []
                 );
-
+    
                 return;
             }
-
+    
             loadUniqueNumbers();
         },
         [
             tableView,
             filterOptions,
             startDate,
+            startTime,
             endDate,
+            endTime,
             minDuration,
             maxDuration,
             viewMode,

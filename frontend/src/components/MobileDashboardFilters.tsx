@@ -49,30 +49,12 @@ type MobileDashboardFiltersProps = {
     minDuration: number;
 
     maxDuration: number | null;
-
-
-
-    onStartDateChange:
-
-        (value: string) => void;
-
-
-
-    onStartTimeChange:
-
-        (value: string) => void;
-
-
-
-    onEndDateChange:
-
-        (value: string) => void;
-
-
-
-    onEndTimeChange:
-
-        (value: string) => void;
+    onDateTimeRangeChange: (
+        startDate: string,
+        startTime: string,
+        endDate: string,
+        endTime: string,
+    ) => void;
 
 
 
@@ -298,12 +280,7 @@ export default function MobileDashboardFilters({
 
     minDuration,
     maxDuration,
-
-    onStartDateChange,
-    onStartTimeChange,
-
-    onEndDateChange,
-    onEndTimeChange,
+    onDateTimeRangeChange,
 
     onMinDurationChange,
     onMaxDurationChange,
@@ -718,37 +695,11 @@ export default function MobileDashboardFilters({
             return;
 
         }
-
-
-
-        onStartDateChange(
-
-            nextStartDate
-
-        );
-
-
-
-        onStartTimeChange(
-
-            draftStartTime
-
-        );
-
-
-
-        onEndDateChange(
-
-            nextEndDate
-
-        );
-
-
-
-        onEndTimeChange(
-
-            draftEndTime
-
+        onDateTimeRangeChange(
+            nextStartDate,
+            draftStartTime,
+            nextEndDate,
+            draftEndTime,
         );
 
 

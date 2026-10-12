@@ -59,16 +59,12 @@ interface DashboardFiltersProps {
     pageNames: string[];
 
     statuses: string[];
-
-
-
-    onStartDateChange: (value: string) => void;
-
-    onStartTimeChange: (value: string) => void;
-
-    onEndDateChange: (value: string) => void;
-
-    onEndTimeChange: (value: string) => void;
+    onDateTimeRangeChange: (
+        startDate: string,
+        startTime: string,
+        endDate: string,
+        endTime: string,
+    ) => void;
 
 
 
@@ -316,16 +312,7 @@ export default function DashboardFilters({
     pageNames,
 
     statuses,
-
-
-
-    onStartDateChange,
-
-    onStartTimeChange,
-
-    onEndDateChange,
-
-    onEndTimeChange,
+    onDateTimeRangeChange,
 
 
 
@@ -784,39 +771,11 @@ export default function DashboardFilters({
             return;
 
         }
-
-
-
-
-
-        onStartDateChange(
-
-            nextStartDate
-
-        );
-
-
-
-        onStartTimeChange(
-
-            draftStartTime
-
-        );
-
-
-
-        onEndDateChange(
-
-            nextEndDate
-
-        );
-
-
-
-        onEndTimeChange(
-
-            draftEndTime
-
+        onDateTimeRangeChange(
+            nextStartDate,
+            draftStartTime,
+            nextEndDate,
+            draftEndTime,
         );
 
 

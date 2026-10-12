@@ -4410,164 +4410,28 @@ export default function DashboardPage({
 
 
                 }
-
-
-
-
-
-
-
-                onStartDateChange={(
-
-
-
-                    value
-
-
-
+                onDateTimeRangeChange={(
+                    newStartDate,
+                    newStartTime,
+                    newEndDate,
+                    newEndTime,
                 ) => {
 
-
-
                     onFiltersChange({
-
-
-
                         ...filters,
-
-
 
                         startDate:
-
-
-
-                            value,
-
-
-
-                    });
-
-
-
-                }}
-
-
-
-
-
-
-
-                onStartTimeChange={(
-
-
-
-                    value
-
-
-
-                ) => {
-
-
-
-                    onFiltersChange({
-
-
-
-                        ...filters,
-
-
+                            newStartDate,
 
                         startTime:
-
-
-
-                            value,
-
-
-
-                    });
-
-
-
-                }}
-
-
-
-
-
-
-
-                onEndDateChange={(
-
-
-
-                    value
-
-
-
-                ) => {
-
-
-
-                    onFiltersChange({
-
-
-
-                        ...filters,
-
-
+                            newStartTime,
 
                         endDate:
-
-
-
-                            value,
-
-
-
-                    });
-
-
-
-                }}
-
-
-
-
-
-
-
-                onEndTimeChange={(
-
-
-
-                    value
-
-
-
-                ) => {
-
-
-
-                    onFiltersChange({
-
-
-
-                        ...filters,
-
-
+                            newEndDate,
 
                         endTime:
-
-
-
-                            value,
-
-
-
+                            newEndTime,
                     });
-
-
 
                 }}
 

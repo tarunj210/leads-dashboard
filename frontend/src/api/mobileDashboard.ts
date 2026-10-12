@@ -416,16 +416,18 @@ export async function fetchMobileUniqueNumbers(
             startDate:
                 filters.startDate,
 
+            
             startTime:
                 filters.startTime,
 
-            endDate:
+endDate:
                 filters.endDate,
 
+            
             endTime:
                 filters.endTime,
 
-            minDuration:
+minDuration:
                 filters.minDuration,
 
             maxDuration:
@@ -448,11 +450,14 @@ export async function fetchMobileUniqueNumbers(
     if (
         !response.ok
     ) {
+
         throw new Error(
             "Failed to load unique mobile numbers"
         );
     }
 
 
-    return response.json();
+    return (
+        response.json()
+    );
 }

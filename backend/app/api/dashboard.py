@@ -29,22 +29,70 @@ router = APIRouter(
 
 @router.get("/summary")
 def dashboard_summary(
-    date_range: str = Query("all"),
-    service: str = Query("all"),
-    domain: str = Query("all"),
-    page_name: str = Query("all"),
-    status: str = Query("all"),
+
+    start_date: str | None = Query(
+        None
+    ),
+
+    start_time: str | None = Query(
+        None
+    ),
+
+    end_date: str | None = Query(
+        None
+    ),
+
+    end_time: str | None = Query(
+        None
+    ),
+
+    service: str = Query(
+        "all"
+    ),
+
+    domain: str = Query(
+        "all"
+    ),
+
+    page_name: str = Query(
+        "all"
+    ),
+
+    status: str = Query(
+        "all"
+    ),
 ):
 
     try:
 
+        (
+            start_datetime,
+            end_datetime,
+        ) = build_datetime_range(
+            start_date=start_date,
+            start_time=start_time,
+            end_date=end_date,
+            end_time=end_time,
+        )
+
+
         return get_summary(
-            date_range=date_range,
+            start_date=start_datetime,
+            end_date=end_datetime,
             service=service,
             domain=domain,
             page_name=page_name,
             status=status,
         )
+
+
+    except ValueError as exc:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
 
     except Exception as exc:
 
@@ -52,7 +100,6 @@ def dashboard_summary(
             status_code=500,
             detail=str(exc),
         )
-
 
 # =========================================
 # Existing filter options

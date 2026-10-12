@@ -373,9 +373,7 @@ def get_mobile_date_range(
 ):
 
     row = (
-
         db.query(
-
             func.min(
                 MobileLead.connect_time
             ).label(
@@ -387,33 +385,33 @@ def get_mobile_date_range(
             ).label(
                 "max_date"
             ),
-
         )
-
         .first()
-
     )
 
 
     if row is None:
 
         return {
-
-            "min_date":
-                None,
-
-            "max_date":
-                None,
-
+            "min_date": None,
+            "max_date": None,
         }
 
 
     return {
+        "min_date": (
+            row.min_date
+            .date()
+            .isoformat()
+            if row.min_date
+            else None
+        ),
 
-        "min_date":
-            row.min_date,
-
-        "max_date":
-            row.max_date,
-
+        "max_date": (
+            row.max_date
+            .date()
+            .isoformat()
+            if row.max_date
+            else None
+        ),
     }

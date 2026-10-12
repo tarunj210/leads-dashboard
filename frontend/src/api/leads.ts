@@ -21,6 +21,19 @@ export interface LeadTableFilters {
     pageSize?: number;
 }
 
+function normalizeDateParam(
+    value?: string
+): string | undefined {
+
+    if (!value) {
+        return undefined;
+    }
+
+    return value
+        .split("T")[0]
+        .split(" ")[0];
+}
+
 
 export async function getFilteredLeads(
     filters: LeadTableFilters = {}
@@ -30,10 +43,12 @@ export async function getFilteredLeads(
         new URLSearchParams();
 
 
-    if (filters.startDate) {
+    const startDate =normalizeDateParam(filters.startDate);
+    
+    if (startDate) {
         params.set(
             "start_date",
-            filters.startDate
+            startDate
         );
     }
 
@@ -46,10 +61,15 @@ export async function getFilteredLeads(
     }
 
 
-    if (filters.endDate) {
+    const endDate =
+    normalizeDateParam(
+        filters.endDate
+    );
+
+    if (endDate) {
         params.set(
             "end_date",
-            filters.endDate
+            endDate
         );
     }
 

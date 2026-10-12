@@ -1,86 +1,174 @@
 import {
 
+
+
     useEffect,
 
+
+
     useState,
+
+
 
 } from "react";
 
 
 
+
+
+
+
 import type {
 
+
+
     WebFilters,
+
+
 
 } from "../types/filters";
 
 
 
+
+
+
+
 import {
+
+
 
     getDashboardData,
 
+
+
     getUniqueEmails,
 
+
+
     type UniqueEmailItem,
+
+
 
 } from "../api/dashboard";
 
 
 
+
+
+
+
 import {
 
+
+
     getFilteredLeads,
+
+
 
 } from "../api/leads";
 
 
 
+
+
+
+
 import DashboardFilters
+
+
 
     from "../components/DashboardFilters";
 
 
 
+
+
+
+
 import MetricCard
+
+
 
     from "../components/MetricCard";
 
 
 
+
+
+
+
 import LeadTable
+
+
 
     from "../components/LeadTable";
 
 
 
+
+
+
+
 import LeadsOverTimeChart
+
+
 
     from "../components/LeadsOverTimeChart";
 
 
 
+
+
+
+
 import type {
+
+
 
     DashboardData,
 
+
+
     DashboardSummary,
+
+
 
     DashboardFilterOptions,
 
+
+
     DateBounds,
 
+
+
     LeadsOverTimePoint,
+
+
 
 } from "../types/dashboard";
 
 
 
+
+
+
+
 import type {
+
+
 
     LeadTableResponse,
 
+
+
 } from "../types/leads";
+
+
+
+
+
+
 
 
 
@@ -90,7 +178,15 @@ type DashboardPageProps = {
 
 
 
+
+
+
+
     refreshKey: number;
+
+
+
+
 
 
 
@@ -98,13 +194,29 @@ type DashboardPageProps = {
 
 
 
+
+
+
+
     onFiltersChange: (
+
+
 
         filters: WebFilters
 
+
+
     ) => void;
 
+
+
 };
+
+
+
+
+
+
 
 
 
@@ -114,11 +226,23 @@ export default function DashboardPage({
 
 
 
+
+
+
+
     refreshKey,
+
+
 
     filters,
 
+
+
     onFiltersChange,
+
+
+
+
 
 
 
@@ -128,27 +252,55 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Dashboard summary
 
+
+
     // =========================================
+
+
+
+
 
 
 
     const [
 
+
+
         summary,
+
+
 
         setSummary,
 
+
+
     ] = useState<
+
+
 
         DashboardSummary | null
 
+
+
     >(
 
+
+
         null
+
+
 
     );
 
@@ -156,33 +308,67 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Faceted filter options
 
+
+
     // =========================================
 
 
 
+
+
+
+
     const [
+
+
 
         filterOptions,
 
+
+
         setFilterOptions,
+
+
 
     ] = useState<
 
+
+
         DashboardFilterOptions
+
+
 
     >({
 
+
+
         services: [],
+
+
 
         domains: [],
 
+
+
         page_names: [],
 
+
+
         statuses: [],
+
+
 
     });
 
@@ -190,29 +376,59 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Date metadata
 
+
+
     // =========================================
+
+
+
+
 
 
 
     const [
 
+
+
         dateBounds,
+
+
 
         setDateBounds,
 
+
+
     ] = useState<
+
+
 
         DateBounds
 
+
+
     >({
+
+
 
         min_date: null,
 
+
+
         max_date: null,
+
+
 
     });
 
@@ -224,51 +440,129 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
+
+
+
+
     // =========================================
+
+
 
     // Selected filters
 
+
+
     // =========================================
+
+
+
+
 
 
 
     const {
 
+
+
         startDate,
+
+
 
         startTime,
 
+
+
         endDate,
+
+
 
         endTime,
 
+
+
         service,
+
+
 
         domain,
 
+
+
         pageName,
 
+
+
         status,
+
+
 
     } = filters;
 
 
 
+    function normalizeDate(
+
+        value: string | null | undefined
+
+    ): string {
+
+        if (!value) {
+
+            return "";
+
+        }
+
+        return value
+
+            .split("T")[0]
+
+            .split(" ")[0];
+
+    }
+
+
+
+
+
+
+
+
+
 
 
     // =========================================
+
+
 
     // Dashboard loading/error
 
+
+
     // =========================================
+
+
+
+
 
 
 
     const [
 
+
+
         loading,
 
+
+
         setLoading,
+
+
 
     ] = useState(true);
 
@@ -276,19 +570,39 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     const [
+
+
 
         error,
 
+
+
         setError,
+
+
 
     ] = useState<
 
+
+
         string | null
+
+
 
     >(
 
+
+
         null
+
+
 
     );
 
@@ -296,23 +610,47 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Leads Over Time
 
+
+
     // =========================================
+
+
+
+
 
 
 
     const [
 
+
+
         leadsOverTime,
+
+
 
         setLeadsOverTime,
 
+
+
     ] = useState<
 
+
+
         LeadsOverTimePoint[]
+
+
 
     >([]);
 
@@ -320,27 +658,55 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Lead table
 
+
+
     // =========================================
+
+
+
+
 
 
 
     const [
 
+
+
         leadData,
+
+
 
         setLeadData,
 
+
+
     ] = useState<
+
+
 
         LeadTableResponse | null
 
+
+
     >(
 
+
+
         null
+
+
 
     );
 
@@ -348,11 +714,23 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     const [
+
+
 
         tablePage,
 
+
+
         setTablePage,
+
+
 
     ] = useState(1);
 
@@ -360,11 +738,23 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     const [
+
+
 
         tableLoading,
 
+
+
         setTableLoading,
+
+
 
     ] = useState(false);
 
@@ -372,23 +762,47 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Lead table view
 
+
+
     // =========================================
+
+
+
+
 
 
 
     const [
 
+
+
         tableView,
+
+
 
         setTableView,
 
+
+
     ] = useState<
 
+
+
         "leads" | "unique"
+
+
 
     >("leads");
 
@@ -396,15 +810,31 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     const [
+
+
 
         uniqueEmails,
 
+
+
         setUniqueEmails,
+
+
 
     ] = useState<
 
+
+
         UniqueEmailItem[]
+
+
 
     >([]);
 
@@ -412,11 +842,23 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     const [
+
+
 
         uniqueEmailsLoading,
 
+
+
         setUniqueEmailsLoading,
+
+
 
     ] = useState(false);
 
@@ -424,11 +866,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Clear filters
 
+
+
     // =========================================
+
+
+
+
 
 
 
@@ -436,53 +892,101 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         onFiltersChange({
+
+
 
             startDate:
 
-                dateBounds.min_date
+                normalizeDate(
+                    dateBounds.min_date
+                ),
 
-                ?? "",
+
 
             startTime:
 
+
+
                 "00:00",
+
+
 
             endDate:
 
-                dateBounds.max_date
+                normalizeDate(
+                    dateBounds.max_date
+                ),
 
-                ?? "",
+
 
             endTime:
 
+
+
                 "23:59",
+
+
 
             service:
 
+
+
                 "all",
+
+
 
             domain:
 
+
+
                 "all",
+
+
 
             pageName:
 
+
+
                 "all",
+
+
 
             status:
 
+
+
                 "all",
+
+
 
         });
 
+
+
         setTablePage(
+
+
 
             1
 
+
+
         );
 
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -492,35 +996,69 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         if (
+
+
 
             !leadData ||
 
+
+
             leadData.items.length === 0
+
+
 
         ) {
 
+
+
             return;
+
+
 
         }
 
 
 
+
+
+
+
         const headers = [
+
+
 
             "Date",
 
+
+
             "Customer",
+
+
 
             "Email",
 
+
+
             "Phone",
+
+
 
             "Service",
 
+
+
             "Status",
 
+
+
             "Domain",
+
+
 
         ];
 
@@ -528,11 +1066,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         const rows =
+
+
 
             leadData.items.map(
 
+
+
                 (lead) => [
+
+
+
+
 
 
 
@@ -540,7 +1092,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     lead.customer_name ?? "",
+
+
+
+
 
 
 
@@ -548,7 +1108,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     lead.customer_phone ?? "",
+
+
+
+
 
 
 
@@ -556,7 +1124,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     lead.status ?? "",
+
+
+
+
 
 
 
@@ -564,7 +1140,13 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                 ]
+
+
 
             );
 
@@ -572,29 +1154,63 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         const escapeCsvValue = (
 
+
+
             value: string | number
+
+
 
         ) => {
 
 
 
+
+
+
+
             const text =
+
+
 
                 String(value);
 
 
 
+
+
+
+
             return `"${text.replace(
+
+
 
                 /"/g,
 
+
+
                 '""'
+
+
 
             )}"`;
 
+
+
         };
+
+
+
+
+
+
 
 
 
@@ -604,7 +1220,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             headers,
+
+
+
+
 
 
 
@@ -612,23 +1236,45 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         ]
+
+
 
             .map(
 
+
+
                 (row) =>
+
+
 
                     row
 
+
+
                         .map(
+
+
 
                             escapeCsvValue
 
+
+
                         )
+
+
 
                         .join(",")
 
+
+
             )
+
+
 
             .join("\n");
 
@@ -636,21 +1282,47 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         const blob =
+
+
 
             new Blob(
 
+
+
                 [csvContent],
+
+
 
                 {
 
+
+
                     type:
+
+
 
                         "text/csv;charset=utf-8;",
 
+
+
                 }
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -658,11 +1330,23 @@ export default function DashboardPage({
 
         const url =
 
+
+
             URL.createObjectURL(
+
+
 
                 blob
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -670,9 +1354,15 @@ export default function DashboardPage({
 
         const link =
 
+
+
             document.createElement(
 
+
+
                 "a"
+
+
 
             );
 
@@ -680,13 +1370,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         link.href =
+
+
 
             url;
 
 
 
+
+
+
+
         link.download =
+
+
 
             "web-leads.csv";
 
@@ -694,11 +1398,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         document.body.appendChild(
+
+
 
             link
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -710,11 +1430,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         document.body.removeChild(
+
+
 
             link
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -722,11 +1458,23 @@ export default function DashboardPage({
 
         URL.revokeObjectURL(
 
+
+
             url
+
+
 
         );
 
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -736,15 +1484,33 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         if (
+
+
 
             uniqueEmails.length === 0
 
+
+
         ) {
+
+
 
             return;
 
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -754,27 +1520,55 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             [
+
+
 
                 "Email",
 
+
+
                 "Lead Count",
+
+
 
             ],
 
 
 
+
+
+
+
             ...uniqueEmails.map(
+
+
 
                 (item) => [
 
+
+
                     item.email,
+
+
 
                     item.lead_count,
 
+
+
                 ]
 
+
+
             ),
+
+
+
+
 
 
 
@@ -784,37 +1578,75 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         const csvContent =
+
+
 
             rows
 
+
+
                 .map(
+
+
 
                     (row) =>
 
+
+
                         row
+
+
 
                             .map(
 
+
+
                                 (value) =>
+
+
 
                                     `"${String(
 
+
+
                                         value
+
+
 
                                     ).replace(
 
+
+
                                         /"/g,
+
+
 
                                         '""'
 
+
+
                                     )}"`
+
+
 
                             )
 
+
+
                             .join(",")
 
+
+
                 )
+
+
 
                 .join("\n");
 
@@ -822,21 +1654,47 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         const blob =
+
+
 
             new Blob(
 
+
+
                 [csvContent],
+
+
 
                 {
 
+
+
                     type:
+
+
 
                         "text/csv;charset=utf-8;",
 
+
+
                 }
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -844,11 +1702,23 @@ export default function DashboardPage({
 
         const url =
 
+
+
             URL.createObjectURL(
+
+
 
                 blob
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -856,9 +1726,15 @@ export default function DashboardPage({
 
         const link =
 
+
+
             document.createElement(
 
+
+
                 "a"
+
+
 
             );
 
@@ -866,13 +1742,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         link.href =
+
+
 
             url;
 
 
 
+
+
+
+
         link.download =
+
+
 
             "unique-emails.csv";
 
@@ -880,11 +1770,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         document.body.appendChild(
+
+
 
             link
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -896,11 +1802,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         document.body.removeChild(
+
+
 
             link
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -908,9 +1830,15 @@ export default function DashboardPage({
 
         URL.revokeObjectURL(
 
+
+
             url
 
+
+
         );
+
+
 
     }
 
@@ -918,11 +1846,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Load unique emails
 
+
+
     // =========================================
+
+
+
+
 
 
 
@@ -930,15 +1872,33 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         try {
+
+
+
+
 
 
 
             setUniqueEmailsLoading(
 
+
+
                 true
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -946,9 +1906,19 @@ export default function DashboardPage({
 
             setError(
 
+
+
                 null
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -956,39 +1926,73 @@ export default function DashboardPage({
 
             const data =
 
+
+
                 await getUniqueEmails({
+
+
+
+
 
 
 
                     startDate:
 
-                        startDate ||
+                        normalizeDate(
+                            startDate
+                        ) ||
 
                         undefined,
+
+
+
+
 
 
 
                     startTime:
 
+
+
                         startTime ||
 
+
+
                         undefined,
+
+
+
+
 
 
 
                     endDate:
 
-                        endDate ||
+                        normalizeDate(
+                            endDate
+                        ) ||
 
                         undefined,
+
+
+
+
 
 
 
                     endTime:
 
+
+
                         endTime ||
 
+
+
                         undefined,
+
+
+
+
 
 
 
@@ -996,7 +2000,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     domain,
+
+
+
+
 
 
 
@@ -1004,11 +2016,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     status,
 
 
 
+
+
+
+
                 });
+
+
+
+
+
+
 
 
 
@@ -1016,9 +2042,17 @@ export default function DashboardPage({
 
             setUniqueEmails(
 
+
+
                 data.items
 
+
+
             );
+
+
+
+
 
 
 
@@ -1026,13 +2060,29 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             console.error(
+
+
 
                 "Failed to load unique emails:",
 
+
+
                 err
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -1040,13 +2090,25 @@ export default function DashboardPage({
 
             setError(
 
+
+
                 err instanceof Error
+
+
 
                     ? err.message
 
+
+
                     : "Failed to load unique emails"
 
+
+
             );
+
+
+
+
 
 
 
@@ -1054,13 +2116,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             setUniqueEmailsLoading(
+
+
 
                 false
 
+
+
             );
 
+
+
         }
+
+
 
     }
 
@@ -1068,11 +2142,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Load dashboard KPIs + facets + chart
 
+
+
     // =========================================
+
+
+
+
 
 
 
@@ -1080,15 +2168,33 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         try {
+
+
+
+
 
 
 
             setLoading(
 
+
+
                 true
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -1096,7 +2202,11 @@ export default function DashboardPage({
 
             setError(
 
+
+
                 null
+
+
 
             );
 
@@ -1104,41 +2214,81 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             const data: DashboardData =
+
+
 
                 await getDashboardData({
 
 
 
+
+
+
+
                     startDate:
 
-                        startDate ||
+                        normalizeDate(
+                            startDate
+                        ) ||
 
                         undefined,
+
+
+
+
 
 
 
                     startTime:
 
+
+
                         startTime ||
 
+
+
                         undefined,
+
+
+
+
 
 
 
                     endDate:
 
-                        endDate ||
+                        normalizeDate(
+                            endDate
+                        ) ||
 
                         undefined,
+
+
+
+
 
 
 
                     endTime:
 
+
+
                         endTime ||
 
+
+
                         undefined,
+
+
+
+
 
 
 
@@ -1146,7 +2296,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     domain,
+
+
+
+
 
 
 
@@ -1154,7 +2312,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     status,
+
+
+
+
 
 
 
@@ -1164,11 +2330,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             setSummary(
+
+
 
                 data.summary
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -1176,19 +2358,50 @@ export default function DashboardPage({
 
             setFilterOptions(
 
+
+
                 data.filter_options
+
+
 
             );
 
 
 
+
+
+
+
+
+
+
+
+            const normalizedDateBounds = {
+
+                min_date:
+                    normalizeDate(
+                        data.date_bounds.min_date
+                    ) || null,
+
+                max_date:
+                    normalizeDate(
+                        data.date_bounds.max_date
+                    ) || null,
+
+            };
 
 
             setDateBounds(
 
-                data.date_bounds
+                normalizedDateBounds
 
             );
+
+
+
+
+
+
 
 
 
@@ -1196,7 +2409,11 @@ export default function DashboardPage({
 
             setLeadsOverTime(
 
+
+
                 data.leads_over_time
+
+
 
             );
 
@@ -1204,19 +2421,71 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             // =================================
+
+
 
             // Initial date range
 
+
+
             // =================================
 
+
+
+
+
+
+
+            const normalizedStartDate =
+
+                normalizeDate(
+                    filters.startDate
+                );
+
+
+            const normalizedEndDate =
+
+                normalizeDate(
+                    filters.endDate
+                );
+
+
+            const resolvedStartDate =
+
+                normalizedStartDate ||
+
+                normalizeDate(
+                    data.date_bounds.min_date
+                );
+
+
+            const resolvedEndDate =
+
+                normalizedEndDate ||
+
+                normalizeDate(
+                    data.date_bounds.max_date
+                );
 
 
             if (
 
-                !filters.startDate ||
+                filters.startDate !==
+                    resolvedStartDate ||
 
-                !filters.endDate
+                filters.endDate !==
+                    resolvedEndDate ||
+
+                !filters.startTime ||
+
+                !filters.endTime
 
             ) {
 
@@ -1225,20 +2494,18 @@ export default function DashboardPage({
                     ...filters,
 
                     startDate:
+                        resolvedStartDate,
 
-                        filters.startDate ||
-
-                        data.date_bounds.min_date ||
-
-                        "",
+                    startTime:
+                        filters.startTime ||
+                        "00:00",
 
                     endDate:
+                        resolvedEndDate,
 
-                        filters.endDate ||
-
-                        data.date_bounds.max_date ||
-
-                        "",
+                    endTime:
+                        filters.endTime ||
+                        "23:59",
 
                 });
 
@@ -1248,125 +2515,253 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             // =================================
+
+
 
             // Faceted-filter safety
 
+
+
             // =================================
+
+
+
+
 
 
 
             const nextFilters = {
 
+
+
                 ...filters,
+
+
 
             };
 
+
+
             let filtersChanged =
+
+
 
                 false;
 
+
+
             if (
+
+
 
                 service !== "all" &&
 
+
+
                 !data.filter_options.services.includes(
+
+
 
                     service
 
+
+
                 )
 
+
+
             ) {
+
+
 
                 nextFilters.service =
 
+
+
                     "all";
+
+
 
                 filtersChanged =
 
+
+
                     true;
+
+
 
             }
 
+
+
             if (
+
+
 
                 domain !== "all" &&
 
+
+
                 !data.filter_options.domains.includes(
+
+
 
                     domain
 
+
+
                 )
 
+
+
             ) {
+
+
 
                 nextFilters.domain =
 
+
+
                     "all";
+
+
 
                 filtersChanged =
 
+
+
                     true;
+
+
 
             }
 
+
+
             if (
+
+
 
                 pageName !== "all" &&
 
+
+
                 !data.filter_options.page_names.includes(
+
+
 
                     pageName
 
+
+
                 )
 
+
+
             ) {
+
+
 
                 nextFilters.pageName =
 
+
+
                     "all";
+
+
 
                 filtersChanged =
 
+
+
                     true;
+
+
 
             }
 
+
+
             if (
+
+
 
                 status !== "all" &&
 
+
+
                 !data.filter_options.statuses.includes(
+
+
 
                     status
 
+
+
                 )
 
+
+
             ) {
+
+
 
                 nextFilters.status =
 
+
+
                     "all";
+
+
 
                 filtersChanged =
 
+
+
                     true;
 
+
+
             }
+
+
 
             if (
 
+
+
                 filtersChanged
+
+
 
             ) {
 
+
+
                 onFiltersChange(
+
+
 
                     nextFilters
 
+
+
                 );
 
+
+
             }
+
+
+
+
 
 
 
@@ -1374,13 +2769,29 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             console.error(
+
+
 
                 "Failed to load dashboard:",
 
+
+
                 err
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -1388,13 +2799,25 @@ export default function DashboardPage({
 
             setError(
 
+
+
                 err instanceof Error
+
+
 
                     ? err.message
 
+
+
                     : "Failed to load dashboard"
 
+
+
             );
+
+
+
+
 
 
 
@@ -1402,13 +2825,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             setLoading(
+
+
 
                 false
 
+
+
             );
 
+
+
         }
+
+
 
     }
 
@@ -1416,21 +2851,45 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Load filtered lead table
 
+
+
     // =========================================
+
+
+
+
 
 
 
     async function loadLeadTable(
 
+
+
         page: number,
+
+
 
         append = false,
 
+
+
     ) {
+
+
+
+
 
 
 
@@ -1438,9 +2897,17 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             setTableLoading(
 
+
+
                 true
+
+
 
             );
 
@@ -1448,41 +2915,81 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             const data =
+
+
 
                 await getFilteredLeads({
 
 
 
+
+
+
+
                     startDate:
 
-                        startDate ||
+                        normalizeDate(
+                            startDate
+                        ) ||
 
                         undefined,
+
+
+
+
 
 
 
                     startTime:
 
+
+
                         startTime ||
 
+
+
                         undefined,
+
+
+
+
 
 
 
                     endDate:
 
-                        endDate ||
+                        normalizeDate(
+                            endDate
+                        ) ||
 
                         undefined,
+
+
+
+
 
 
 
                     endTime:
 
+
+
                         endTime ||
 
+
+
                         undefined,
+
+
+
+
 
 
 
@@ -1490,7 +2997,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     domain,
+
+
+
+
 
 
 
@@ -1498,7 +3013,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     status,
+
+
+
+
 
 
 
@@ -1506,9 +3029,19 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     pageSize:
 
+
+
                         25,
+
+
+
+
 
 
 
@@ -1518,35 +3051,71 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             setLeadData(
+
+
 
                 (
 
+
+
                     current
+
+
 
                 ) => {
 
 
 
+
+
+
+
                     /*
+
+
 
                      * First page or filter change:
 
+
+
                      * replace existing rows.
+
+
 
                      */
 
+
+
                     if (
+
+
 
                         !append ||
 
+
+
                         !current
+
+
 
                     ) {
 
 
 
+
+
+
+
                         return data;
+
+
 
                     }
 
@@ -1554,27 +3123,59 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                     /*
+
+
 
                      * Load more:
 
+
+
                      * append only new rows.
+
+
 
                      */
 
+
+
                     const existingIds =
+
+
 
                         new Set(
 
+
+
                             current.items.map(
+
+
 
                                 (lead) =>
 
+
+
                                     lead.id
+
+
 
                             )
 
+
+
                         );
+
+
+
+
+
+
 
 
 
@@ -1582,15 +3183,27 @@ export default function DashboardPage({
 
                     const newItems =
 
+
+
                         data.items.filter(
+
+
 
                             (lead) =>
 
+
+
                                 !existingIds.has(
+
+
 
                                     lead.id
 
+
+
                                 )
+
+
 
                         );
 
@@ -1598,25 +3211,55 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                     return {
+
+
 
                         ...data,
 
 
 
+
+
+
+
                         items: [
+
+
 
                             ...current.items,
 
+
+
                             ...newItems,
+
+
 
                         ],
 
+
+
                     };
+
+
 
                 }
 
+
+
             );
+
+
+
+
+
+
 
 
 
@@ -1624,9 +3267,17 @@ export default function DashboardPage({
 
             setTablePage(
 
+
+
                 page
 
+
+
             );
+
+
+
+
 
 
 
@@ -1634,13 +3285,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             console.error(
+
+
 
                 "Failed to load lead table:",
 
+
+
                 err
 
+
+
             );
+
+
+
+
 
 
 
@@ -1648,15 +3313,29 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             setTableLoading(
 
+
+
                 false
+
+
 
             );
 
 
 
+
+
+
+
         }
+
+
 
     }
 
@@ -1664,15 +3343,33 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Filter changes
 
+
+
     // =========================================
+
+
+
+
 
 
 
     useEffect(() => {
+
+
+
+
 
 
 
@@ -1682,11 +3379,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         setTablePage(
+
+
 
             1
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -1694,41 +3407,81 @@ export default function DashboardPage({
 
         loadLeadTable(
 
+
+
             1,
 
+
+
             false
+
+
 
         );
 
 
 
+
+
+
+
     }, [
+
+
 
         startDate,
 
+
+
         startTime,
+
+
 
         endDate,
 
+
+
         endTime,
+
+
 
         service,
 
+
+
         domain,
+
+
 
         pageName,
 
+
+
         status,
+
+
 
     ]);
 
 
 
+
+
+
+
     // =========================================
+
+
 
     // Unique email view
 
+
+
     // =========================================
+
+
+
+
 
 
 
@@ -1736,15 +3489,33 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         if (
+
+
 
             tableView !== "unique"
 
+
+
         ) {
+
+
 
             return;
 
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -1754,25 +3525,49 @@ export default function DashboardPage({
 
 
 
+
+
+
+
     }, [
+
+
 
         tableView,
 
+
+
         startDate,
+
+
 
         startTime,
 
+
+
         endDate,
+
+
 
         endTime,
 
+
+
         service,
+
+
 
         domain,
 
+
+
         pageName,
 
+
+
         status,
+
+
 
     ]);
 
@@ -1780,11 +3575,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Header refresh
 
+
+
     // =========================================
+
+
+
+
 
 
 
@@ -1792,15 +3601,33 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         if (
+
+
 
             refreshKey === 0
 
+
+
         ) {
+
+
 
             return;
 
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -1812,11 +3639,27 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
         setTablePage(
+
+
 
             1
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -1824,11 +3667,23 @@ export default function DashboardPage({
 
         loadLeadTable(
 
+
+
             1,
+
+
 
             false
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -1836,19 +3691,35 @@ export default function DashboardPage({
 
         if (
 
+
+
             tableView === "unique"
+
+
 
         ) {
 
+
+
             loadUniqueEmails();
+
+
 
         }
 
 
 
+
+
+
+
     }, [
 
+
+
         refreshKey,
+
+
 
     ]);
 
@@ -1856,35 +3727,73 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Table pagination
 
-    // =========================================
-
-
-
-
-
-
-
 
 
     // =========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // =========================================
+
+
 
     // Initial loading
 
+
+
     // =========================================
+
+
+
+
 
 
 
     if (
 
+
+
         loading &&
+
+
 
         !summary
 
+
+
     ) {
+
+
+
+
 
 
 
@@ -1892,15 +3801,31 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             <div className="dashboard-page">
+
+
+
+
 
 
 
                 <p>
 
+
+
                     Loading dashboard...
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -1908,7 +3833,13 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         );
+
+
 
     }
 
@@ -1916,21 +3847,45 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Initial error
 
+
+
     // =========================================
+
+
+
+
 
 
 
     if (
 
+
+
         error &&
+
+
 
         !summary
 
+
+
     ) {
+
+
+
+
 
 
 
@@ -1938,23 +3893,47 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             <div className="dashboard-page">
+
+
+
+
 
 
 
                 <h2>
 
+
+
                     Failed to load dashboard
+
+
 
                 </h2>
 
 
 
+
+
+
+
                 <p>
+
+
 
                     {error}
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -1962,9 +3941,21 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         );
 
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -1974,7 +3965,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         return (
+
+
+
+
 
 
 
@@ -1982,11 +3981,23 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                 <p>
+
+
 
                     No dashboard data available.
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -1994,7 +4005,13 @@ export default function DashboardPage({
 
 
 
+
+
+
+
         );
+
+
 
     }
 
@@ -2002,33 +4019,71 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Percentage helper
 
+
+
     // =========================================
+
+
+
+
 
 
 
     function getPercentage(
 
+
+
         value: number
+
+
 
     ) {
 
 
 
+
+
+
+
         if (
 
+
+
             summary.total_leads === 0
+
+
 
         ) {
 
 
 
+
+
+
+
             return 0;
 
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -2038,19 +4093,37 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             (
+
+
 
                 value /
 
+
+
                 summary.total_leads
 
+
+
             ) *
+
+
 
             100
 
 
 
+
+
+
+
         );
+
+
 
     }
 
@@ -2058,15 +4131,33 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
     // =========================================
+
+
 
     // Render
 
+
+
     // =========================================
+
+
+
+
 
 
 
     return (
+
+
+
+
 
 
 
@@ -2076,11 +4167,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             {/* =================================
+
+
 
                 Filters
 
+
+
             ================================= */}
+
+
+
+
 
 
 
@@ -2088,283 +4193,563 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                 startDate={
+
+
 
                     startDate
 
+
+
                 }
+
+
+
+
 
 
 
                 startTime={
 
+
+
                     startTime
 
+
+
                 }
+
+
+
+
 
 
 
                 endDate={
 
+
+
                     endDate
 
+
+
                 }
+
+
+
+
 
 
 
                 endTime={
 
+
+
                     endTime
 
+
+
                 }
+
+
+
+
 
 
 
                 minDate={
 
-                    dateBounds.min_date
+                    normalizeDate(
+                        dateBounds.min_date
+                    ) || null
 
                 }
+
+
+
+
 
 
 
                 maxDate={
 
-                    dateBounds.max_date
+                    normalizeDate(
+                        dateBounds.max_date
+                    ) || null
 
                 }
+
+
+
+
 
 
 
                 service={
 
+
+
                     service
 
+
+
                 }
+
+
+
+
 
 
 
                 domain={
 
+
+
                     domain
 
+
+
                 }
+
+
+
+
 
 
 
                 pageName={
 
+
+
                     pageName
 
+
+
                 }
+
+
+
+
 
 
 
                 status={
 
+
+
                     status
 
+
+
                 }
+
+
+
+
 
 
 
                 services={
 
+
+
                     filterOptions.services
 
+
+
                 }
+
+
+
+
 
 
 
                 domains={
 
+
+
                     filterOptions.domains
 
+
+
                 }
+
+
+
+
 
 
 
                 pageNames={
 
+
+
                     filterOptions.page_names
 
+
+
                 }
+
+
+
+
 
 
 
                 statuses={
 
+
+
                     filterOptions.statuses
 
+
+
                 }
+
+
+
+
 
 
 
                 onStartDateChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         startDate:
+
+
 
                             value,
 
+
+
                     });
 
+
+
                 }}
+
+
+
+
 
 
 
                 onStartTimeChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         startTime:
+
+
 
                             value,
 
+
+
                     });
 
+
+
                 }}
+
+
+
+
 
 
 
                 onEndDateChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         endDate:
+
+
 
                             value,
 
+
+
                     });
 
+
+
                 }}
+
+
+
+
 
 
 
                 onEndTimeChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         endTime:
+
+
 
                             value,
 
+
+
                     });
 
+
+
                 }}
+
+
+
+
 
 
 
                 onServiceChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         service:
+
+
 
                             value,
 
+
+
                     });
 
+
+
                 }}
+
+
+
+
 
 
 
                 onDomainChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         domain:
+
+
 
                             value,
 
+
+
                     });
 
+
+
                 }}
+
+
+
+
 
 
 
                 onPageNameChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         pageName:
+
+
 
                             value,
 
+
+
                     });
 
+
+
                 }}
+
+
+
+
 
 
 
                 onStatusChange={(
 
+
+
                     value
+
+
 
                 ) => {
 
+
+
                     onFiltersChange({
+
+
 
                         ...filters,
 
+
+
                         status:
+
+
 
                             value,
 
+
+
                     });
+
+
 
                 }}
 
 
 
+
+
+
+
                 onClearFilters={
+
+
 
                     clearFilters
 
+
+
                 }
+
+
+
+
 
 
 
@@ -2374,29 +4759,63 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             {/* =================================
+
+
 
                 Loading / Error
 
+
+
             ================================= */}
 
 
 
+
+
+
+
             {
+
+
 
                 loading &&
 
+
+
                 (
+
+
 
                     <p className="dashboard-updating">
 
+
+
                         Updating dashboard...
+
+
 
                     </p>
 
+
+
                 )
 
+
+
             }
+
+
+
+
+
+
 
 
 
@@ -2404,19 +4823,39 @@ export default function DashboardPage({
 
             {
 
+
+
                 error &&
+
+
 
                 (
 
+
+
                     <p className="dashboard-error">
+
+
 
                         {error}
 
+
+
                     </p>
+
+
 
                 )
 
+
+
             }
+
+
+
+
+
+
 
 
 
@@ -2424,9 +4863,17 @@ export default function DashboardPage({
 
             {/* =================================
 
+
+
                 KPI Cards
 
+
+
             ================================= */}
+
+
+
+
 
 
 
@@ -2436,43 +4883,87 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                 <MetricCard
+
+
 
                     title="Total leads"
 
+
+
                     value={
+
+
 
                         summary.total_leads
 
+
+
                     }
+
+
 
                     subtitle="In selected range"
 
+
+
                 />
 
 
 
 
 
+
+
+
+
+
+
                 <MetricCard
+
+
 
                     title="Booked"
 
+
+
                     value={
+
+
 
                         summary.booked
 
+
+
                     }
+
+
 
                     subtitle={
 
+
+
                         `${getPercentage(
+
+
 
                             summary.booked
 
+
+
                         )}% of leads`
 
+
+
                     }
+
+
 
                 />
 
@@ -2480,25 +4971,51 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                 <MetricCard
+
+
 
                     title="In process"
 
+
+
                     value={
+
+
 
                         summary.in_process
 
+
+
                     }
+
+
 
                     subtitle={
 
+
+
                         `${getPercentage(
+
+
 
                             summary.in_process
 
+
+
                         )}% of leads`
 
+
+
                     }
+
+
 
                 />
 
@@ -2506,27 +5023,59 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                 <MetricCard
+
+
 
                     title="Not booked"
 
+
+
                     value={
+
+
 
                         summary.not_booked
 
+
+
                     }
+
+
 
                     subtitle={
 
+
+
                         `${getPercentage(
+
+
 
                             summary.not_booked
 
+
+
                         )}% of leads`
+
+
 
                     }
 
+
+
                 />
+
+
+
+
+
+
 
 
 
@@ -2534,17 +5083,33 @@ export default function DashboardPage({
 
                 <MetricCard
 
+
+
                     title="Conversion rate"
+
+
 
                     value={
 
+
+
                         `${summary.conversion_rate}%`
+
+
 
                     }
 
+
+
                     subtitle="Booked ÷ total leads"
 
+
+
                 />
+
+
+
+
 
 
 
@@ -2554,11 +5119,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             {/* =================================
+
+
 
                 Analytics
 
+
+
             ================================= */}
+
+
+
+
 
 
 
@@ -2568,37 +5147,77 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                 {/* =============================
 
+
+
                     Leads Per Day
+
+
 
                 ============================= */}
 
 
 
+
+
+
+
                 <section
+
+
 
                     className="
 
+
+
                         web-section-card
+
+
 
                         web-chart-section
 
+
+
                     "
+
+
 
                 >
 
 
 
+
+
+
+
                     <LeadsOverTimeChart
+
+
 
                         data={
 
+
+
                             leadsOverTime
+
+
 
                         }
 
+
+
                     />
+
+
+
+
 
 
 
@@ -2608,25 +5227,53 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                 {/* =============================
 
+
+
                     Status Breakdown
+
+
 
                 ============================= */}
 
 
 
+
+
+
+
                 <section
+
+
 
                     className="
 
+
+
                         web-section-card
+
+
 
                         web-status-section
 
+
+
                     "
 
+
+
                 >
+
+
+
+
 
 
 
@@ -2634,27 +5281,55 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                         <div>
+
+
+
+
 
 
 
                             <h2>
 
+
+
                                 Status breakdown
+
+
 
                             </h2>
 
 
 
+
+
+
+
                             <p>
+
+
 
                                 Where the{" "}
 
+
+
                                 {summary.total_leads}{" "}
+
+
 
                                 leads are now
 
+
+
                             </p>
+
+
+
+
 
 
 
@@ -2662,7 +5337,17 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                     </div>
+
+
+
+
+
+
 
 
 
@@ -2674,7 +5359,17 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                         {/* Booked */}
+
+
+
+
 
 
 
@@ -2682,15 +5377,31 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                             <div className="status-breakdown-row-header">
+
+
+
+
 
 
 
                                 <span className="status-breakdown-name">
 
+
+
                                     Booked
 
+
+
                                 </span>
+
+
+
+
 
 
 
@@ -2698,7 +5409,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     {summary.booked}
+
+
+
+
 
 
 
@@ -2706,15 +5425,31 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     {
+
+
 
                                         getPercentage(
 
+
+
                                             summary.booked
+
+
 
                                         )
 
+
+
                                     }
+
+
+
+
 
 
 
@@ -2722,11 +5457,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 </span>
 
 
 
+
+
+
+
                             </div>
+
+
+
+
+
+
 
 
 
@@ -2736,29 +5485,59 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <div
+
+
 
                                     className="
 
+
+
                                         status-progress-bar
+
+
 
                                         status-progress-booked
 
+
+
                                     "
+
+
 
                                     style={{
 
+
+
                                         width:
+
+
 
                                             `${getPercentage(
 
+
+
                                                 summary.booked
+
+
 
                                             )}%`,
 
+
+
                                     }}
 
+
+
                                 />
+
+
+
+
 
 
 
@@ -2766,7 +5545,17 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                         </div>
+
+
+
+
+
+
 
 
 
@@ -2776,7 +5565,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                         <div className="status-breakdown-row">
+
+
+
+
 
 
 
@@ -2784,11 +5581,23 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <span className="status-breakdown-name">
+
+
 
                                     In process
 
+
+
                                 </span>
+
+
+
+
 
 
 
@@ -2796,7 +5605,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     {summary.in_process}
+
+
+
+
 
 
 
@@ -2804,15 +5621,31 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     {
+
+
 
                                         getPercentage(
 
+
+
                                             summary.in_process
+
+
 
                                         )
 
+
+
                                     }
+
+
+
+
 
 
 
@@ -2820,11 +5653,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 </span>
 
 
 
+
+
+
+
                             </div>
+
+
+
+
+
+
 
 
 
@@ -2834,29 +5681,59 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <div
+
+
 
                                     className="
 
+
+
                                         status-progress-bar
+
+
 
                                         status-progress-process
 
+
+
                                     "
+
+
 
                                     style={{
 
+
+
                                         width:
+
+
 
                                             `${getPercentage(
 
+
+
                                                 summary.in_process
+
+
 
                                             )}%`,
 
+
+
                                     }}
 
+
+
                                 />
+
+
+
+
 
 
 
@@ -2864,7 +5741,17 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                         </div>
+
+
+
+
+
+
 
 
 
@@ -2874,7 +5761,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                         <div className="status-breakdown-row">
+
+
+
+
 
 
 
@@ -2882,11 +5777,23 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <span className="status-breakdown-name">
+
+
 
                                     Not booked
 
+
+
                                 </span>
+
+
+
+
 
 
 
@@ -2894,7 +5801,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     {summary.not_booked}
+
+
+
+
 
 
 
@@ -2902,15 +5817,31 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     {
+
+
 
                                         getPercentage(
 
+
+
                                             summary.not_booked
+
+
 
                                         )
 
+
+
                                     }
+
+
+
+
 
 
 
@@ -2918,11 +5849,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 </span>
 
 
 
+
+
+
+
                             </div>
+
+
+
+
+
+
 
 
 
@@ -2932,29 +5877,59 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <div
+
+
 
                                     className="
 
+
+
                                         status-progress-bar
+
+
 
                                         status-progress-not-booked
 
+
+
                                     "
+
+
 
                                     style={{
 
+
+
                                         width:
+
+
 
                                             `${getPercentage(
 
+
+
                                                 summary.not_booked
+
+
 
                                             )}%`,
 
+
+
                                     }}
 
+
+
                                 />
+
+
+
+
 
 
 
@@ -2962,7 +5937,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                         </div>
+
+
+
+
 
 
 
@@ -2972,21 +5955,45 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                     {
+
+
 
                         summary.in_process > 0 &&
 
+
+
                         (
+
+
 
                             <div className="status-insight">
 
 
 
+
+
+
+
                                 <strong>
+
+
 
                                     {summary.in_process}
 
+
+
                                 </strong>
+
+
+
+
 
 
 
@@ -2994,19 +6001,39 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 leads are still in process.
 
+
+
                                 Follow-ups here have the
+
+
 
                                 biggest effect on conversion.
 
 
 
+
+
+
+
                             </div>
+
+
 
                         )
 
+
+
                     }
+
+
+
+
 
 
 
@@ -3014,7 +6041,17 @@ export default function DashboardPage({
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -3022,9 +6059,17 @@ export default function DashboardPage({
 
             {/* =================================
 
+
+
                 Lead table views
 
+
+
             ================================= */}
+
+
+
+
 
 
 
@@ -3032,39 +6077,81 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                 <button
+
+
 
                     type="button"
 
 
 
+
+
+
+
                     className={
+
+
 
                         tableView === "leads"
 
+
+
                             ? "web-data-view-tab active"
+
+
 
                             : "web-data-view-tab"
 
+
+
                     }
+
+
+
+
 
 
 
                     onClick={() =>
 
+
+
                         setTableView(
+
+
 
                             "leads"
 
+
+
                         )
+
+
 
                     }
 
+
+
                 >
+
+
 
                     Leads
 
+
+
                 </button>
+
+
+
+
+
+
 
 
 
@@ -3072,37 +6159,73 @@ export default function DashboardPage({
 
                 <button
 
+
+
                     type="button"
+
+
+
+
 
 
 
                     className={
 
+
+
                         tableView === "unique"
+
+
 
                             ? "web-data-view-tab active"
 
+
+
                             : "web-data-view-tab"
 
+
+
                     }
+
+
+
+
 
 
 
                     onClick={() =>
 
+
+
                         setTableView(
+
+
 
                             "unique"
 
+
+
                         )
+
+
 
                     }
 
+
+
                 >
+
+
 
                     Unique Emails
 
+
+
                 </button>
+
+
+
+
 
 
 
@@ -3112,23 +6235,49 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
             {
+
+
 
                 tableView === "leads"
 
+
+
                     ? (
+
+
 
                         <section
 
+
+
                             className="
+
+
 
                                 web-section-card
 
+
+
                                 web-leads-table-section
+
+
 
                             "
 
+
+
                         >
+
+
+
+
 
 
 
@@ -3136,29 +6285,61 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <div>
+
+
+
+
 
 
 
                                     <h2>
 
+
+
                                         Lead details
+
+
 
                                     </h2>
 
 
 
+
+
+
+
                                     <p>
+
+
 
                                         Website enquiries matching
 
+
+
                                         the selected filters
+
+
 
                                     </p>
 
 
 
+
+
+
+
                                 </div>
+
+
+
+
+
+
 
 
 
@@ -3168,21 +6349,43 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     <span className="web-table-count">
+
+
+
+
 
 
 
                                         {
 
+
+
                                             leadData?.total ??
 
+
+
                                             summary.total_leads
+
+
 
                                         }
 
 
 
+
+
+
+
                                         {" "}leads
+
+
+
+
 
 
 
@@ -3192,31 +6395,65 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                                     <button
+
+
 
                                         type="button"
 
+
+
                                         className="web-export-button"
+
+
 
                                         onClick={
 
+
+
                                             exportWebLeadsToCsv
 
+
+
                                         }
+
+
 
                                         disabled={
 
+
+
                                             !leadData ||
+
+
 
                                             leadData.items.length === 0
 
+
+
                                         }
+
+
 
                                     >
 
+
+
                                         ↓  Export CSV
 
+
+
                                     </button>
+
+
+
+
 
 
 
@@ -3224,7 +6461,17 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                             </div>
+
+
+
+
+
+
 
 
 
@@ -3234,19 +6481,39 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 data={
+
+
 
                                     leadData
 
+
+
                                 }
+
+
+
+
 
 
 
                                 loading={
 
+
+
                                     tableLoading
 
+
+
                                 }
+
+
+
+
 
 
 
@@ -3254,19 +6521,41 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     if (
+
+
 
                                         !leadData ||
 
+
+
                                         tableLoading
+
+
 
                                     ) {
 
 
 
+
+
+
+
                                         return;
 
+
+
                                     }
+
+
+
+
+
+
 
 
 
@@ -3274,17 +6563,35 @@ export default function DashboardPage({
 
                                     if (
 
+
+
                                         tablePage >=
 
+
+
                                         leadData.total_pages
+
+
 
                                     ) {
 
 
 
+
+
+
+
                                         return;
 
+
+
                                     }
+
+
+
+
+
+
 
 
 
@@ -3292,11 +6599,21 @@ export default function DashboardPage({
 
                                     loadLeadTable(
 
+
+
                                         tablePage + 1,
+
+
 
                                         true
 
+
+
                                     );
+
+
+
+
 
 
 
@@ -3304,27 +6621,55 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                             />
+
+
+
+
 
 
 
                         </section>
 
+
+
                     )
+
+
 
                     : (
 
+
+
                         <section
+
+
 
                             className="
 
+
+
                                 web-section-card
+
+
 
                                 web-leads-table-section
 
+
+
                             "
 
+
+
                         >
+
+
+
+
 
 
 
@@ -3332,29 +6677,61 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <div>
+
+
+
+
 
 
 
                                     <h2>
 
+
+
                                         Unique emails
+
+
 
                                     </h2>
 
 
 
+
+
+
+
                                     <p>
+
+
 
                                         Unique customer email addresses
 
+
+
                                         matching the selected filters
+
+
 
                                     </p>
 
 
 
+
+
+
+
                                 </div>
+
+
+
+
+
+
 
 
 
@@ -3364,19 +6741,39 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                     <span className="web-table-count">
+
+
+
+
 
 
 
                                         {
 
+
+
                                             uniqueEmails.length
+
+
 
                                         }
 
 
 
+
+
+
+
                                         {" "}unique emails
+
+
+
+
 
 
 
@@ -3386,33 +6783,69 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                                     <button
+
+
 
                                         type="button"
 
+
+
                                         className="web-export-button"
+
+
 
                                         onClick={
 
+
+
                                             exportUniqueEmailsToCsv
 
+
+
                                         }
+
+
 
                                         disabled={
 
+
+
                                             uniqueEmails.length === 0
+
+
 
                                         }
 
+
+
                                     >
 
+
+
                                         ↓  Export CSV
+
+
 
                                     </button>
 
 
 
+
+
+
+
                                 </div>
+
+
+
+
 
 
 
@@ -3422,21 +6855,47 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                             {
+
+
 
                                 uniqueEmailsLoading &&
 
+
+
                                 (
+
+
 
                                     <div className="web-unique-email-loading">
 
+
+
                                         Loading unique emails...
+
+
 
                                     </div>
 
+
+
                                 )
 
+
+
                             }
+
+
+
+
+
+
 
 
 
@@ -3446,7 +6905,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 <table className="web-unique-email-table">
+
+
+
+
 
 
 
@@ -3454,27 +6921,55 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                         <tr>
 
 
 
+
+
+
+
                                             <th>
+
+
 
                                                 Email
 
+
+
                                             </th>
+
+
+
+
 
 
 
                                             <th>
 
+
+
                                                 Lead Count
 
+
+
                                             </th>
+
+
+
+
 
 
 
                                         </tr>
+
+
+
+
 
 
 
@@ -3484,101 +6979,205 @@ export default function DashboardPage({
 
 
 
+
+
+
+
+
+
                                     <tbody>
+
+
+
+
 
 
 
                                         {
 
+
+
                                             uniqueEmails.length === 0
 
+
+
                                                 ? (
+
+
 
                                                     <tr>
 
 
 
+
+
+
+
                                                         <td
+
+
 
                                                             colSpan={
 
+
+
                                                                 2
 
+
+
                                                             }
+
+
 
                                                             className="web-unique-email-empty"
 
+
+
                                                         >
+
+
 
                                                             {
 
+
+
                                                                 uniqueEmailsLoading
+
+
 
                                                                     ? "Loading unique emails..."
 
+
+
                                                                     : "No unique emails found for the selected filters."
 
+
+
                                                             }
+
+
 
                                                         </td>
 
 
 
+
+
+
+
                                                     </tr>
+
+
 
                                                 )
 
+
+
                                                 : (
+
+
 
                                                     uniqueEmails.map(
 
+
+
                                                         (item) => (
+
+
 
                                                             <tr
 
+
+
                                                                 key={
+
+
 
                                                                     item.email
 
+
+
                                                                 }
+
+
 
                                                             >
 
 
 
+
+
+
+
                                                                 <td>
 
+
+
                                                                     {
+
+
 
                                                                         item.email
 
+
+
                                                                     }
 
+
+
                                                                 </td>
+
+
+
+
 
 
 
                                                                 <td>
 
+
+
                                                                     {
+
+
 
                                                                         item.lead_count
 
+
+
                                                                     }
 
+
+
                                                                 </td>
+
+
+
+
 
 
 
                                                             </tr>
 
+
+
                                                         )
+
+
 
                                                     )
 
+
+
                                                 )
 
+
+
                                         }
+
+
+
+
 
 
 
@@ -3586,7 +7185,15 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                                 </table>
+
+
+
+
 
 
 
@@ -3594,11 +7201,25 @@ export default function DashboardPage({
 
 
 
+
+
+
+
                         </section>
+
+
 
                     )
 
+
+
             }
+
+
+
+
+
+
 
 
 
@@ -3608,6 +7229,12 @@ export default function DashboardPage({
 
 
 
+
+
+
+
     );
+
+
 
 }

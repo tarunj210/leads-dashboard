@@ -29,6 +29,19 @@ export interface UniqueEmailsResponse {
     items: UniqueEmailItem[];
 }
 
+function normalizeDateParam(
+    value?: string
+): string | undefined {
+
+    if (!value) {
+        return undefined;
+    }
+
+    return value
+        .split("T")[0]
+        .split(" ")[0];
+}
+
 
 function buildDashboardParams(
     filters: DashboardFilters
@@ -38,10 +51,12 @@ function buildDashboardParams(
         new URLSearchParams();
 
 
-    if (filters.startDate) {
+    const startDate =normalizeDateParam(filters.startDate);
+    
+    if (startDate) {
         params.set(
             "start_date",
-            filters.startDate
+            startDate
         );
     }
 
@@ -54,10 +69,15 @@ function buildDashboardParams(
     }
 
 
-    if (filters.endDate) {
+    const endDate =
+    normalizeDateParam(
+        filters.endDate
+    );
+
+    if (endDate) {
         params.set(
             "end_date",
-            filters.endDate
+            endDate
         );
     }
 

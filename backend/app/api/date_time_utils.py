@@ -1,6 +1,34 @@
 from datetime import datetime
 
 
+def normalize_date(
+    value: str | None,
+) -> str | None:
+    """
+    Accept either:
+
+    2026-09-09
+
+    or:
+
+    2026-09-09T00:00:00
+
+    and always return:
+
+    2026-09-09
+    """
+
+    if not value:
+        return None
+
+
+    return (
+        value
+        .split("T")[0]
+        .split(" ")[0]
+    )
+
+
 def build_datetime_range(
     *,
     start_date: str | None,
@@ -11,43 +39,42 @@ def build_datetime_range(
     datetime | None,
     datetime | None,
 ]:
-    """
-    Convert the frontend's separate date/time
-    query parameters into datetime boundaries.
-
-    Start:
-        selected minute starts at :00
-
-    End:
-        selected minute ends at :59
-
-    Examples:
-        2026-10-12 + 09:30
-        -> 2026-10-12 09:30:00
-
-        2026-10-12 + 17:45
-        -> 2026-10-12 17:45:59
-    """
 
     start_datetime = None
     end_datetime = None
 
 
-    if start_date:
+    normalized_start_date =
+        normalize_date(
+            start_date
+        )
+
+
+    normalized_end_date =
+        normalize_date(
+            end_date
+        )
+
+
+    if normalized_start_date:
 
         effective_start_time = (
             start_time
             or "00:00"
         )
 
+
         try:
-            start_datetime = (
+
+            start_datetime =
                 datetime.strptime(
-                    f"{start_date} "
-                    f"{effective_start_time}",
+                    (
+                        f"{normalized_start_date} "
+                        f"{effective_start_time}"
+                    ),
                     "%Y-%m-%d %H:%M",
                 )
-            )
+
 
         except ValueError as exc:
 
@@ -56,18 +83,22 @@ def build_datetime_range(
             ) from exc
 
 
-    if end_date:
+    if normalized_end_date:
 
         effective_end_time = (
             end_time
             or "23:59"
         )
 
+
         try:
+
             end_datetime = (
                 datetime.strptime(
-                    f"{end_date} "
-                    f"{effective_end_time}",
+                    (
+                        f"{normalized_end_date} "
+                        f"{effective_end_time}"
+                    ),
                     "%Y-%m-%d %H:%M",
                 )
                 .replace(
@@ -75,6 +106,7 @@ def build_datetime_range(
                     microsecond=999999,
                 )
             )
+
 
         except ValueError as exc:
 

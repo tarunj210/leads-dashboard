@@ -26,18 +26,48 @@ def get_available_dates(db):
         for row in rows
     ]
 
-def get_date_bounds(db):
+def get_date_bounds(
+    db
+):
+
     result = (
         db.query(
-            func.min(Lead.lead_received_date),
-            func.max(Lead.lead_received_date),
+            func.min(
+                Lead.lead_received_date
+            ),
+            func.max(
+                Lead.lead_received_date
+            ),
         )
         .one()
     )
 
+
+    min_date =
+        result[0]
+
+    max_date =
+        result[1]
+
+
     return {
-        "min_date": result[0],
-        "max_date": result[1],
+        "min_date":
+            (
+                min_date
+                .date()
+                .isoformat()
+                if min_date
+                else None
+            ),
+
+        "max_date":
+            (
+                max_date
+                .date()
+                .isoformat()
+                if max_date
+                else None
+            ),
     }
 
 

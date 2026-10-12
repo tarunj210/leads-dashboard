@@ -23,10 +23,7 @@ def reset_mobile_ingestion(
     ),
 ):
 
-    expected_key =
-        os.getenv(
-            "ADMIN_RESET_KEY"
-        )
+    expected_key =os.getenv("ADMIN_RESET_KEY")
 
 
     if not expected_key:

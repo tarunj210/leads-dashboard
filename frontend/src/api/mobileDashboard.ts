@@ -130,13 +130,16 @@ export type MobileUniqueNumbersResponse = {
 ========================================= */
 
 export type MobileDashboardFilters = {
-
     startDate?: string;
+    startTime?: string;
+
     endDate?: string;
+    endTime?: string;
 
     minDuration?: number;
 
-    maxDuration?: number | null;
+    maxDuration?:
+        number | null;
 
     viewMode?:
         | "forwarded"
@@ -163,27 +166,33 @@ function buildQuery(
         new URLSearchParams();
 
 
-    if (
-        filters.startDate
-    ) {
-
+    if (filters.startDate) {
         params.set(
             "start_date",
             filters.startDate
         );
     }
-
-
-    if (
-        filters.endDate
-    ) {
-
+        
+    if (filters.startTime) {
+        params.set(
+            "start_time",
+            filters.startTime
+        );
+    }
+        
+    if (filters.endDate) {
         params.set(
             "end_date",
             filters.endDate
         );
     }
-
+        
+    if (filters.endTime) {
+        params.set(
+            "end_time",
+            filters.endTime
+        );
+    }
 
     if (
         filters.minDuration
@@ -309,27 +318,31 @@ export async function fetchMobileSummary(
 ): Promise<MobileSummary> {
 
     const query =
-        buildQuery({
+    buildQuery({
+        startDate:
+            filters.startDate,
 
-            startDate:
-                filters.startDate,
+        startTime:
+            filters.startTime,
 
-            endDate:
-                filters.endDate,
+        endDate:
+            filters.endDate,
 
-            minDuration:
-                filters.minDuration,
+        endTime:
+            filters.endTime,
 
-            maxDuration:
-                filters.maxDuration,
+        minDuration:
+            filters.minDuration,
 
-            viewMode:
-                filters.viewMode,
+        maxDuration:
+            filters.maxDuration,
 
-            selectedCld:
-                filters.selectedCld,
+        viewMode:
+            filters.viewMode,
 
-        });
+        selectedCld:
+            filters.selectedCld,
+    });
 
 
     const response =

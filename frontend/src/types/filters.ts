@@ -5,7 +5,6 @@ export interface FilterOptions {
     statuses: string[];
 }
 
-
 export type DateTimeRangeFilters = {
     startDate: string;
     startTime: string;
@@ -14,7 +13,6 @@ export type DateTimeRangeFilters = {
     endTime: string;
 };
 
-
 export type WebFilters =
     DateTimeRangeFilters & {
         service: string;
@@ -22,7 +20,6 @@ export type WebFilters =
         pageName: string;
         status: string;
     };
-
 
 export type MobileFilters =
     DateTimeRangeFilters & {
@@ -36,7 +33,6 @@ export type MobileFilters =
         selectedCld:
             string | null;
     };
-
 
 export type MessageFilters =
     DateTimeRangeFilters;

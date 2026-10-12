@@ -22,19 +22,31 @@ export type LeadMessageResponse = {
 
 export async function fetchLeadMessage(
     startDate: string,
+    startTime: string,
     endDate: string,
+    endTime: string,
 ): Promise<LeadMessageResponse> {
 
     const params =
         new URLSearchParams({
-            start_date: startDate,
-            end_date: endDate,
+            start_date:
+                startDate,
+
+            start_time:
+                startTime,
+
+            end_date:
+                endDate,
+
+            end_time:
+                endTime,
         });
 
 
-    const response = await fetch(
-        `${API_BASE_URL}/api/message/leads?${params.toString()}`
-    );
+    const response =
+        await fetch(
+            `${API_BASE_URL}/api/message/leads?${params.toString()}`
+        );
 
 
     if (!response.ok) {

@@ -62,7 +62,11 @@ export default function MobileDashboard({
 
     const {
         startDate,
+        startTime,
+
         endDate,
+        endTime,
+
         minDuration,
         maxDuration,
         viewMode,
@@ -719,44 +723,43 @@ export default function MobileDashboard({
     function clearFilters() {
 
         onFiltersChange({
-    
+
             startDate:
                 filterOptions
                     ?.date_range
                     .min_date
                 ?? "",
-    
+
             startTime:
                 "00:00",
-    
+
             endDate:
                 filterOptions
                     ?.date_range
                     .max_date
                 ?? "",
-    
+
             endTime:
                 "23:59",
-    
+
             minDuration:
                 filterOptions
                     ?.duration
                     .default_min
                 ?? 60,
-    
+
             maxDuration:
                 filterOptions
                     ?.duration
                     .default_max
                 ?? null,
-    
+
             viewMode,
-    
+
             selectedCld:
                 null,
         });
-    
-    
+
         setPage(
             1
         );
@@ -1103,7 +1106,7 @@ export default function MobileDashboard({
     );
 
 
-    
+
 
 
     /* =========================================
@@ -1401,13 +1404,11 @@ export default function MobileDashboard({
             ================================= */}
 
             <MobileDashboardFilters
-                startDate={
-                    startDate
-                }
+                startDate={startDate}
+                startTime={startTime}
 
-                endDate={
-                    endDate
-                }
+                endDate={endDate}
+                endTime={endTime}
 
                 minDate={
                     filterOptions
@@ -1431,49 +1432,47 @@ export default function MobileDashboard({
                     maxDuration
                 }
 
-                onStartDateChange={(
-                    value
-                ) => {
+                onStartDateChange={(value) =>
                     onFiltersChange({
                         ...filters,
+                        startDate: value,
+                    })
+                }
 
-                        startDate:
-                            value,
-                    });
-                }}
-
-                onEndDateChange={(
-                    value
-                ) => {
+                onStartTimeChange={(value) =>
                     onFiltersChange({
                         ...filters,
+                        startTime: value,
+                    })
+                }
 
-                        endDate:
-                            value,
-                    });
-                }}
-
-                onMinDurationChange={(
-                    value
-                ) => {
+                onEndDateChange={(value) =>
                     onFiltersChange({
                         ...filters,
+                        endDate: value,
+                    })
+                }
 
-                        minDuration:
-                            value,
-                    });
-                }}
-
-                onMaxDurationChange={(
-                    value
-                ) => {
+                onEndTimeChange={(value) =>
                     onFiltersChange({
                         ...filters,
+                        endTime: value,
+                    })
+                }
 
-                        maxDuration:
-                            value,
-                    });
-                }}
+                onMinDurationChange={(value) =>
+                    onFiltersChange({
+                        ...filters,
+                        minDuration: value,
+                    })
+                }
+
+                onMaxDurationChange={(value) =>
+                    onFiltersChange({
+                        ...filters,
+                        maxDuration: value,
+                    })
+                }
 
                 onClearFilters={
                     clearFilters
@@ -1566,7 +1565,7 @@ export default function MobileDashboard({
                                     summary.unique_cli
 
                                     ? `${summary.total_calls -
-                                        summary.unique_cli
+                                    summary.unique_cli
                                     } called more than once`
 
                                     : "No repeat callers"

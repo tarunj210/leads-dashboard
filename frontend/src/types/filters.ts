@@ -5,34 +5,38 @@ export interface FilterOptions {
     statuses: string[];
 }
 
-export type WebFilters = {
-    startDate: string;
-    endDate: string;
 
-    service: string;
-    domain: string;
-    pageName: string;
-    status: string;
+export type DateTimeRangeFilters = {
+    startDate: string;
+    startTime: string;
+
+    endDate: string;
+    endTime: string;
 };
 
 
-export type MobileFilters = {
-    startDate: string;
-    endDate: string;
-
-    minDuration: number;
-    maxDuration: number | null;
-
-    viewMode:
-        | "forwarded"
-        | "website";
-
-    selectedCld:
-        string | null;
-};
+export type WebFilters =
+    DateTimeRangeFilters & {
+        service: string;
+        domain: string;
+        pageName: string;
+        status: string;
+    };
 
 
-export type MessageFilters = {
-    startDate: string;
-    endDate: string;
-};
+export type MobileFilters =
+    DateTimeRangeFilters & {
+        minDuration: number;
+        maxDuration: number | null;
+
+        viewMode:
+            | "forwarded"
+            | "website";
+
+        selectedCld:
+            string | null;
+    };
+
+
+export type MessageFilters =
+    DateTimeRangeFilters;

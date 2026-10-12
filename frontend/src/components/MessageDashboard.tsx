@@ -12,19 +12,29 @@ import {
     type LeadMessageResponse,
 } from "../api/message";
 
+import MessageDateTimeFilter
+    from "../components/MessageDateTimeFilter";
+
 import "./MessageDashboard.css";
 
 
 type MessageDashboardProps = {
+
     refreshKey: number;
 
-    filters: MessageFilters;
+    filters:
+        MessageFilters;
 
     onFiltersChange: (
-        filters: MessageFilters
+        filters:
+            MessageFilters
     ) => void;
 };
 
+
+/* =========================================
+   Date helper
+========================================= */
 
 function normalizeDate(
     value: string
@@ -40,65 +50,27 @@ function normalizeDate(
 }
 
 
-function toDateTimeLocalValue(
-    date: string,
-    time: string,
-): string {
-
-    const normalizedDate =
-        normalizeDate(
-            date
-        );
-
-    if (!normalizedDate) {
-        return "";
-    }
-
-    return `${normalizedDate}T${time || "00:00"}`;
-}
-
-
-function splitDateTimeLocalValue(
-    value: string,
-): {
-    date: string;
-    time: string;
-} {
-
-    if (!value) {
-        return {
-            date: "",
-            time: "",
-        };
-    }
-
-    const [
-        date,
-        time = "",
-    ] = value.split("T");
-
-    return {
-        date,
-        time:
-            time.slice(
-                0,
-                5
-            ),
-    };
-}
-
+/* =========================================
+   Component
+========================================= */
 
 export default function MessageDashboard({
+
     refreshKey,
     filters,
     onFiltersChange,
+
 }: MessageDashboardProps) {
 
+
     const {
+
         startDate,
         startTime,
+
         endDate,
         endTime,
+
     } = filters;
 
 
@@ -130,12 +102,17 @@ export default function MessageDashboard({
     );
 
 
+    /* =========================================
+       Load message
+    ========================================= */
+
     async function loadMessage() {
 
         const normalizedStartDate =
             normalizeDate(
                 startDate
             );
+
 
         const normalizedEndDate =
             normalizeDate(
@@ -157,6 +134,7 @@ export default function MessageDashboard({
                 true
             );
 
+
             setError(
                 null
             );
@@ -164,10 +142,17 @@ export default function MessageDashboard({
 
             const result =
                 await fetchLeadMessage(
+
                     normalizedStartDate,
-                    startTime || "00:00",
+
+                    startTime ||
+                    "00:00",
+
                     normalizedEndDate,
-                    endTime || "23:59",
+
+                    endTime ||
+                    "23:59",
+
                 );
 
 
@@ -198,9 +183,15 @@ export default function MessageDashboard({
     }
 
 
+    /* =========================================
+       Download text file
+    ========================================= */
+
     function downloadMessage() {
 
-        if (!data) {
+        if (
+            !data
+        ) {
             return;
         }
 
@@ -238,6 +229,7 @@ export default function MessageDashboard({
         anchor.href =
             url;
 
+
         anchor.download =
             `leads-${date}.txt`;
 
@@ -249,6 +241,7 @@ export default function MessageDashboard({
 
         anchor.click();
 
+
         anchor.remove();
 
 
@@ -258,10 +251,10 @@ export default function MessageDashboard({
     }
 
 
-    /*
-     * Reload automatically whenever the
-     * selected date/time range changes.
-     */
+    /* =========================================
+       Reload when filter changes
+    ========================================= */
+
     useEffect(
         () => {
 
@@ -271,6 +264,7 @@ export default function MessageDashboard({
             ) {
                 return;
             }
+
 
             loadMessage();
 
@@ -284,10 +278,10 @@ export default function MessageDashboard({
     );
 
 
-    /*
-     * Header refresh should regenerate
-     * the currently selected range.
-     */
+    /* =========================================
+       Header refresh
+    ========================================= */
+
     useEffect(
         () => {
 
@@ -299,6 +293,7 @@ export default function MessageDashboard({
                 return;
             }
 
+
             loadMessage();
 
         },
@@ -308,10 +303,18 @@ export default function MessageDashboard({
     );
 
 
+    /* =========================================
+       Render
+    ========================================= */
+
     return (
 
         <div className="message-dashboard">
 
+
+            {/* =================================
+                Header
+            ================================= */}
 
             <div className="message-header">
 
@@ -320,6 +323,7 @@ export default function MessageDashboard({
                     <h1>
                         Lead Message
                     </h1>
+
 
                     <p>
                         Generate call and email leads
@@ -331,101 +335,65 @@ export default function MessageDashboard({
             </div>
 
 
+            {/* =================================
+                Date & Time Filter
+            ================================= */}
+
             <div className="message-filters">
 
 
-                <div className="message-filter">
+                <MessageDateTimeFilter
 
-                    <label>
-                        Start date & time
-                    </label>
+                    startDate={
+                        startDate
+                    }
 
-                    <input
-                        type="datetime-local"
+                    startTime={
+                        startTime ||
+                        "00:00"
+                    }
 
-                        value={
-                            toDateTimeLocalValue(
-                                startDate,
-                                startTime || "00:00",
-                            )
-                        }
+                    endDate={
+                        endDate
+                    }
 
-                        onChange={(
-                            event
-                        ) => {
-
-                            const {
-                                date,
-                                time,
-                            } =
-                                splitDateTimeLocalValue(
-                                    event.target.value
-                                );
+                    endTime={
+                        endTime ||
+                        "23:59"
+                    }
 
 
-                            onFiltersChange({
+                    onDateTimeRangeChange={(
+                        newStartDate,
+                        newStartTime,
+                        newEndDate,
+                        newEndTime,
+                    ) => {
 
-                                ...filters,
+                        /*
+                         * Update all four values
+                         * together.
+                         */
+                        onFiltersChange({
 
-                                startDate:
-                                    date,
+                            ...filters,
 
-                                startTime:
-                                    time || "00:00",
+                            startDate:
+                                newStartDate,
 
-                            });
+                            startTime:
+                                newStartTime,
 
-                        }}
-                    />
+                            endDate:
+                                newEndDate,
 
-                </div>
+                            endTime:
+                                newEndTime,
 
+                        });
 
-                <div className="message-filter">
-
-                    <label>
-                        End date & time
-                    </label>
-
-                    <input
-                        type="datetime-local"
-
-                        value={
-                            toDateTimeLocalValue(
-                                endDate,
-                                endTime || "23:59",
-                            )
-                        }
-
-                        onChange={(
-                            event
-                        ) => {
-
-                            const {
-                                date,
-                                time,
-                            } =
-                                splitDateTimeLocalValue(
-                                    event.target.value
-                                );
-
-
-                            onFiltersChange({
-
-                                ...filters,
-
-                                endDate:
-                                    date,
-
-                                endTime:
-                                    time || "23:59",
-
-                            });
-
-                        }}
-                    />
-
-                </div>
+                    }}
+                />
 
 
                 <button
@@ -453,23 +421,43 @@ export default function MessageDashboard({
 
                 </button>
 
+
             </div>
 
+
+            {/* =================================
+                Error
+            ================================= */}
 
             {
                 error &&
                 (
+
                     <div className="message-error">
-                        {error}
+
+                        {
+                            error
+                        }
+
                     </div>
+
                 )
             }
 
+
+            {/* =================================
+                Result
+            ================================= */}
 
             {
                 data &&
                 (
                     <>
+
+
+                        {/* =========================
+                            Summary
+                        ========================= */}
 
                         <div className="message-summary">
 
@@ -480,11 +468,14 @@ export default function MessageDashboard({
                                     Call Leads
                                 </span>
 
+
                                 <strong>
+
                                     {
                                         data
                                             .call_lead_count
                                     }
+
                                 </strong>
 
                             </div>
@@ -496,11 +487,14 @@ export default function MessageDashboard({
                                     Email Leads
                                 </span>
 
+
                                 <strong>
+
                                     {
                                         data
                                             .email_lead_count
                                     }
+
                                 </strong>
 
                             </div>
@@ -508,6 +502,10 @@ export default function MessageDashboard({
 
                         </div>
 
+
+                        {/* =========================
+                            Preview header
+                        ========================= */}
 
                         <div className=
                             "message-preview-header"
@@ -528,21 +526,33 @@ export default function MessageDashboard({
                                     downloadMessage
                                 }
                             >
+
                                 Download .txt
+
                             </button>
 
                         </div>
 
 
-                        <pre className="message-preview">
+                        {/* =========================
+                            Message preview
+                        ========================= */}
+
+                        <pre className=
+                            "message-preview"
+                        >
+
                             {
                                 data.message
                             }
+
                         </pre>
+
 
                     </>
                 )
             }
+
 
         </div>
     );

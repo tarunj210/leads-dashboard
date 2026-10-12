@@ -425,3 +425,19 @@
     }
 
 }
+
+.message-filters {
+    overflow: visible;
+}
+
+.message-filters .date-filter {
+    min-width: 300px;
+}
+
+.message-filters .date-picker-wrapper {
+    overflow: visible;
+}
+
+.message-filters .calendar-popup {
+    z-index: 9999;
+}

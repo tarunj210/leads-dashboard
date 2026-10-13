@@ -1,4 +1,3 @@
-import json
 import os
 
 from google.auth.transport.requests import Request
@@ -11,34 +10,68 @@ SCOPES = [
 ]
 
 
-def get_google_credentials() -> Credentials:
-    token_json = os.getenv("GOOGLE_TOKEN_JSON")
+def get_required_env(
+    name: str,
+) -> str:
 
-    if not token_json:
-        raise RuntimeError(
-            "GOOGLE_TOKEN_JSON environment variable is not set"
-        )
-
-    token_data = json.loads(token_json)
-
-    credentials = Credentials.from_authorized_user_info(
-        token_data,
-        SCOPES,
+    value = os.getenv(
+        name
     )
 
-    if credentials.expired and credentials.refresh_token:
-        credentials.refresh(Request())
+    if not value:
+        raise RuntimeError(
+            f"{name} environment variable is not set"
+        )
+
+    return value
+
+
+def get_google_credentials() -> Credentials:
+
+    client_id = get_required_env(
+        "GOOGLE_CLIENT_ID"
+    )
+
+    client_secret = get_required_env(
+        "GOOGLE_CLIENT_SECRET"
+    )
+
+    refresh_token = get_required_env(
+        "GOOGLE_REFRESH_TOKEN"
+    )
+
+
+    credentials = Credentials(
+        token=None,
+        refresh_token=refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=client_id,
+        client_secret=client_secret,
+        scopes=SCOPES,
+    )
+
+
+    credentials.refresh(
+        Request()
+    )
+
 
     if not credentials.valid:
+
         raise RuntimeError(
             "Google credentials are not valid"
         )
+
 
     return credentials
 
 
 def get_sheets_service():
-    credentials = get_google_credentials()
+
+    credentials = (
+        get_google_credentials()
+    )
+
 
     return build(
         "sheets",

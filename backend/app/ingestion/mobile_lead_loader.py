@@ -9,14 +9,18 @@ from app.integrations.google_sheets import (
 from googleapiclient.errors import (
     HttpError,
 )
-# ---------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------
+import os
 
 
+MOBILE_LEADS_SHEET_ID = os.getenv(
+    "MOBILE_LEADS_SHEET_ID"
+)
 
-# Replace with mobile spreadsheet ID
-SPREADSHEET_ID = "1qY_sCbXAI97WDKvqchUX7sv_n3pubCfeIhwzfYrpXms"
+
+if not MOBILE_LEADS_SHEET_ID:
+    raise RuntimeError(
+        "MOBILE_LEADS_SHEET_ID environment variable is not set"
+    )
 
 
 # Change "Data" if your tab name is different

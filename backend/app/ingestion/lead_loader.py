@@ -7,14 +7,17 @@ import pandas as pd
 from app.integrations.google_sheets import (
     get_sheets_service,
 )
+import os
+
+EMAIL_LEADS_SHEET_ID = os.getenv(
+    "EMAIL_LEADS_SHEET_ID"
+)
 
 
-# ---------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------
-
-
-SPREADSHEET_ID = "19L7ZMFqButG0j7UW5HpYeVuwFCLX0B1_5FhtLyihhWI"
+if not EMAIL_LEADS_SHEET_ID:
+    raise RuntimeError(
+        "EMAIL_LEADS_SHEET_ID environment variable is not set"
+    )
 SHEET_NAME = "Data"
 
 

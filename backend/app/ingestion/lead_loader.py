@@ -143,7 +143,7 @@ def fetch_sheet_values(
         .values()
         .get(
             spreadsheetId=(
-                SPREADSHEET_ID
+                EMAIL_LEADS_SHEET_ID
             ),
             range=range_name,
             valueRenderOption=(
